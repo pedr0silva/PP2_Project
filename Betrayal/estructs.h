@@ -1,8 +1,28 @@
+/*
+File: functions.c
+Description: This file has the needed data structures to develop and run the game.
+------------//---------------//------------//---------------//------------//---------------
+Name: Pedro Silva
+Email: pmiguelfs@gmail.com
+Date Log:
+12/04/2017 - Created a few auxiliar definitions, like boolean and string.
+		   - Began working on the game structures (Created Minion, Omen, Item and Character).
+
+14/04/2017 - Created the rest of the necessary structs (they might need some work tho).
+------------//---------------//------------//---------------//------------//---------------
+Name: Diogo Portela
+Email:
+Date Log:
+
+*/
+
 #include <stdio.h>
+#define MAX_CARDS 
 #define MAX_OMENS 13
 #define MAX_ITEMS 22
 #define MAX_EVENTS 45
 #define MAX_CHARACTERS 12
+#define MAX_ROOMS 44
 
 #ifndef  STRING
 #define STRING
@@ -17,6 +37,13 @@ typedef char *string;
 typedef enum {FALSE, TRUE} boolean;
 
 #endif // !BOOLEAN
+
+#ifndef FLOOR
+#define FLOOR
+
+typedef enum {BASEMENT = -1, GROUND, UPPER} floor;
+
+#endif // !FLOOR
 
 #ifndef MINION
 #define MINION
@@ -46,7 +73,6 @@ struct Omen
 typedef struct Omen Omen, *OmenPtr;
 
 #endif // !OMEN
-
 
 #ifndef ITEM
 #define ITEM
@@ -89,17 +115,16 @@ typedef struct History History, *HistoryPtr;
 
 #endif // !HISTORY
 
-
 #ifndef CHARACTER
 #define CHARACTER
 
 struct Character
 {
 	string name;
-	int might, speed, sanity, intellect;
-	Minion *minions;
-	Item *items;
-	History *history;
+	int might, speed, sanity, inteligence;
+	MinionPtr minions;
+	ItemPtr items;
+	HistoryPtr history;
 	struct Character *next;
 };
 
@@ -107,6 +132,37 @@ typedef struct Character Character, *CharacterPtr;
 
 #endif // !CHARACTERS
 
+#ifndef ROOM
+#define ROOM
+
+struct Room
+{
+	string name;
+	CharacterPtr characterList;
+	EventPtr event;
+	OmenPtr omen;
+	struct Room *next;
+};
+
+typedef struct Room Room, *RoomPtr;
+
+#endif // !ROOM
+
+#ifndef MAP
+#define MAP
+
+struct Map
+{
+	floor mapFloor;
+	RoomPtr roomList;
+	int roomCounter;
+	struct Map *next;
+	struct Map *prev;
+};
+
+typedef struct Map Map, *MapPtr;
+
+#endif // !MAP
 
 #ifndef CARDS
 #define CARDS
