@@ -138,10 +138,9 @@ typedef struct Character Character, *CharacterPtr;
 struct Room
 {
 	string name;
-	CharacterPtr characterList;
 	EventPtr event;
 	OmenPtr omen;
-	struct Room *next;
+	struct Room *up;
 };
 
 typedef struct Room Room, *RoomPtr;
@@ -163,6 +162,18 @@ struct Map
 typedef struct Map Map, *MapPtr;
 
 #endif // !MAP
+
+#ifndef MASTER
+#define MASTER
+
+struct Master
+{
+	CharacterPtr characterList;
+	MapPtr head;
+};
+
+#endif // !MASTER
+
 
 #ifndef CARDS
 #define CARDS
