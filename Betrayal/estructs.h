@@ -24,7 +24,20 @@ Date Log:
 #define MAX_CHARACTERS 12
 #define MAX_ROOMS 44
 
-#ifndef  STRING
+//------------------------------------GENERALS-------------------------------------//
+#ifndef SIGNATURES
+#define SIGNATURES
+
+struct Minion;
+struct Omen;
+struct Item;
+struct Event;
+struct Character;
+struct Card;
+
+#endif // !SIGNATURES
+
+#ifndef STRING
 #define STRING
 
 typedef char *string;
@@ -38,20 +51,96 @@ typedef enum {FALSE, TRUE} boolean;
 
 #endif // !BOOLEAN
 
+#ifndef HISTORY
+#define HISTORY
+
+struct History
+{
+	string turn;
+	struct History *next;
+};
+
+typedef struct History History, *HistoryPtr;
+
+#endif // !HISTORY
+
+//-----------------------------------END-GENERALS-------------------------------------//
+
+//------------------------------------MAP-------------------------------------//
 #ifndef FLOOR
 #define FLOOR
 
-typedef enum {BASEMENT = -1, GROUND, UPPER} floor;
+typedef enum { BASEMENT = -1, GROUND, UPPER } Floor;
 
 #endif // !FLOOR
 
+#ifndef DIRECTION
+#define DIRECTION
+
+typedef enum direction { Up, Right, Down, Left } Direction;
+
+#endif // !Direction
+
+#ifndef WALLTYPE
+#define WALLTYPE
+
+typedef enum wallType { Empy, Door, Window } WallType;
+
+#endif // !Direction
+
+#ifndef ROOMWALL
+#define ROOMWALL
+
+struct roomWall
+{
+	Direction Direction;
+	WallType WallType;
+};
+
+typedef struct roomWall RoomWall;
+#endif // !RoomWall
+
+#ifndef ROOM
+#define ROOM
+
+struct Room
+{
+	string name;
+	RoomWall Wall[4];
+	EventPtr event;
+	OmenPtr omen;
+	struct Room *Up, *Down, *Left, *Right, *Above, *Below;
+};
+
+typedef struct Room Room, *RoomPtr;
+
+#endif // !ROOM
+
+#ifndef MAP
+#define MAP
+
+struct Map
+{
+	Floor mapFloor;
+	RoomPtr roomList;
+	int roomCounter;
+	struct Map *next;
+	struct Map *prev;
+};
+
+typedef struct Map Map, *MapPtr;
+
+#endif // !MAP
+//-----------------------------------END-MAP----------------------------------//
+
+//------------------------------------GAME-ITEMS-------------------------------------//
 #ifndef MINION
 #define MINION
 
 struct Minion
 {
 	string name;
-	int might_mod, speed_mod, sanity_mod, intellect_mod; 
+	int might_mod, speed_mod, sanity_mod, intellect_mod;
 	//usamos a tag mod porque os minions nao teem stats eles proprios, mas modificam as stats do seu "mestre".
 	struct Minion *next;
 };
@@ -94,41 +183,13 @@ typedef struct Item Item, *ItemPtr;
 struct Event
 {
 	string name, description;
-	//int might_mod, speed_mod, sanity_mod, intellect_mod;
+	int might_mod, speed_mod, sanity_mod, intellect_mod;
 	struct Event *next;
 };
 
 typedef struct Event Event, *EventPtr;
 
 #endif // !EVENT
-
-#ifndef HISTORY
-#define HISTORY
-
-struct History
-{
-	string turn;
-	struct History *next;
-};
-
-typedef struct History History, *HistoryPtr;
-
-#endif // !HISTORY
-
-#ifndef ROOM
-#define ROOM
-
-struct Room
-{
-	string name;
-	EventPtr event;
-	OmenPtr omen;
-	struct Room *up;
-};
-
-typedef struct Room Room, *RoomPtr;
-
-#endif // !ROOM
 
 #ifndef CHARACTER
 #define CHARACTER
@@ -148,34 +209,6 @@ typedef struct Character Character, *CharacterPtr;
 
 #endif // !CHARACTER
 
-#ifndef MAP
-#define MAP
-
-struct Map
-{
-	floor mapFloor;
-	RoomPtr roomList;
-	int roomCounter;
-	struct Map *next;
-	struct Map *prev;
-};
-
-typedef struct Map Map, *MapPtr;
-
-#endif // !MAP
-
-#ifndef MASTER
-#define MASTER
-
-struct Master
-{
-	CharacterPtr characterList;
-	MapPtr head;
-};
-
-#endif // !MASTER
-
-
 #ifndef CARDS
 #define CARDS
 
@@ -190,3 +223,15 @@ struct Card
 typedef struct Card Card, *CardPtr;
 
 #endif // !CARDS
+//-----------------------------END-GAME-ITEMS----------------------------------//
+
+#ifndef MASTER
+#define MASTER
+
+struct Master
+{
+	CharacterPtr characterList;
+	MapPtr head;
+};
+
+#endif // !MASTER

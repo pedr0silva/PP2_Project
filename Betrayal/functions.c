@@ -18,7 +18,7 @@ Date Log:
 #include "estructs.h"
 
 //Allocates memory for a Map and gives value to it's atributes.
-MapPtr CreateMap(floor mapFloor)
+MapPtr CreateMap(Floor mapFloor)
 {
 	MapPtr aux = (MapPtr)malloc(sizeof(Map));
 
@@ -39,8 +39,8 @@ RoomPtr CreateRoom(string roomName, EventPtr roomEvent, OmenPtr roomOmen)
 	aux->name = roomName;
 	aux->event = roomEvent;
 	aux->omen = roomOmen;
-	aux->characterList = NULL;
-	aux->next = NULL;
+	//aux->characterList = NULL;
+	//aux->next = NULL;
 
 	return aux;
 }
