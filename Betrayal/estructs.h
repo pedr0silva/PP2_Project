@@ -115,23 +115,6 @@ typedef struct History History, *HistoryPtr;
 
 #endif // !HISTORY
 
-#ifndef CHARACTER
-#define CHARACTER
-
-struct Character
-{
-	string name;
-	int might, speed, sanity, inteligence;
-	MinionPtr minions;
-	ItemPtr items;
-	HistoryPtr history;
-	struct Character *next;
-};
-
-typedef struct Character Character, *CharacterPtr;
-
-#endif // !CHARACTERS
-
 #ifndef ROOM
 #define ROOM
 
@@ -146,6 +129,24 @@ struct Room
 typedef struct Room Room, *RoomPtr;
 
 #endif // !ROOM
+
+#ifndef CHARACTER
+#define CHARACTER
+
+struct Character
+{
+	string name;
+	int might, speed, sanity, inteligence;
+	MinionPtr minions;
+	ItemPtr items;
+	HistoryPtr history;
+	RoomPtr room;
+	struct Character *next;
+};
+
+typedef struct Character Character, *CharacterPtr;
+
+#endif // !CHARACTER
 
 #ifndef MAP
 #define MAP
