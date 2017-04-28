@@ -17,7 +17,7 @@ Date Log:
 
 int main(void)
 {
-	int damageTrack = 0;
+
 
 	return 0;
 }

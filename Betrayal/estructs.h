@@ -9,11 +9,13 @@ Date Log:
 		   - Began working on the game structures (Created Minion, Omen, Item and Character).
 
 14/04/2017 - Created the rest of the necessary structs (they might need some work tho).
+27/04/2017 - Minor Fixes
+28/04/2017 - Minor Fixes
 ------------//---------------//------------//---------------//------------//---------------
 Name: Diogo Portela
-Email:
+Email: 
 Date Log:
-
+27/04/2017 - Minor Fixes
 */
 
 #include <stdio.h>
@@ -79,14 +81,14 @@ typedef enum { BASEMENT = -1, GROUND, UPPER } Floor;
 
 typedef enum direction { Up, Right, Down, Left } Direction;
 
-#endif // !Direction
+#endif // !DIRECTION
 
 #ifndef WALLTYPE
 #define WALLTYPE
 
 typedef enum wallType { Empy, Door, Window } WallType;
 
-#endif // !Direction
+#endif // !WALLTYPE
 
 #ifndef ROOMWALL
 #define ROOMWALL
@@ -98,7 +100,7 @@ struct roomWall
 };
 
 typedef struct roomWall RoomWall;
-#endif // !RoomWall
+#endif // !ROOMWALL
 
 #ifndef ROOM
 #define ROOM
@@ -230,8 +232,11 @@ typedef struct Card Card, *CardPtr;
 
 struct Master
 {
+	int damageTrack;
 	CharacterPtr characterList;
 	MapPtr head;
 };
+
+typedef struct Master Master;
 
 #endif // !MASTER
