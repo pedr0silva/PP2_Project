@@ -6,9 +6,14 @@ Description: This file has the needed functions to operate the data structures.
 Name: Pedro Silva
 Email: pmiguelfs@gmail.com
 Date Log:
-14/04/2017 - Created a few basic functions to create maps, rooms and characters
+14/04/2017 - Created a few basic functions to create maps, rooms and characters.
+
 27/04/2017 - Worked on auxiliar functions to insert/modify the cards available in the game.
-28/04/2017 - Added DiceRoll, Asign and Unasign Minion and Item functions
+
+28/04/2017 - Added DiceRoll, Asign and Unasign Minion and Item functions.
+		   - Added functions to save the game cards to a file.
+
+01/05/2017 - Added LoadCards function.
 ------------//---------------//------------//---------------//------------//---------------
 Name: Diogo Portela
 Email:
@@ -18,6 +23,14 @@ Date Log:
 
 #include <stdio.h>
 #include "estructs.h"
+
+//Allocates memory for database cards.
+CardPtr CreateDatabase(void)
+{
+	CardPtr aux = (CardPtr)malloc(sizeof(Card));
+	
+	return aux;
+}
 
 //Allocates memory for a Map and gives value to it's atributes.
 MapPtr CreateMap(Floor mapFloor)
@@ -247,7 +260,6 @@ void AddCharacterCards(Character infoChar[])
 
 	FILE *f = fopen("cards.bin", "ab");
 
-
 	for (int i = 0; i < MAX_CHARACTERS; i++)
 	{
 		printf("Insert characters name: ");
@@ -387,7 +399,7 @@ void AddItemCards(Item infoItem[])
 	fclose(f);
 }
 
-//Uses the functions above to ask for card information and add it to the database
+//Uses the functions above to ask for card information and add it to the database.
 void AddCards(Card c)
 {
 	AddCharacterCards(c.characterList);
@@ -398,5 +410,20 @@ void AddCards(Card c)
 	printf("CARDS SAVED...");
 
 }
+
+//Reads from the "cards.bin" file all the cards that compose the game.
+void LoadCards(Card c)
+{
+	FILE *f = fopen("cards.bin", "rb");
+
+	fread(c.characterList, sizeof(Character), MAX_CHARACTERS, f);
+	fread(c.eventList, sizeof(Event), MAX_EVENTS, f);
+	fread(c.omenList, sizeof(Omen), MAX_OMENS, f);
+	fread(c.itemList, sizeof(Item), MAX_ITEMS, f);
+
+	fclose(f);
+}
+
+
 
 #pragma endregion

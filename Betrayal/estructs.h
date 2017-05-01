@@ -9,8 +9,13 @@ Date Log:
 		   - Began working on the game structures (Created Minion, Omen, Item and Character).
 
 14/04/2017 - Created the rest of the necessary structs (they might need some work tho).
-27/04/2017 - Minor Fixes
-28/04/2017 - Minor Fixes
+
+27/04/2017 - Minor Fixes.
+
+28/04/2017 - Minor Fixes.
+
+01/04/2017 - Added some functions' signatures.
+		   - Minor Fixes.
 ------------//---------------//------------//---------------//------------//---------------
 Name: Diogo Portela
 Email: 
@@ -19,7 +24,7 @@ Date Log:
 */
 
 #include <stdio.h>
-#define MAX_CARDS 
+#define MAX_CARDS 136
 #define MAX_OMENS 13
 #define MAX_ITEMS 22
 #define MAX_EVENTS 45
@@ -27,18 +32,6 @@ Date Log:
 #define MAX_ROOMS 44
 
 //------------------------------------GENERALS-------------------------------------//
-#ifndef SIGNATURES
-#define SIGNATURES
-
-struct Minion;
-struct Omen;
-struct Item;
-struct Event;
-struct Character;
-struct Card;
-
-#endif // !SIGNATURES
-
 #ifndef STRING
 #define STRING
 
@@ -49,9 +42,10 @@ typedef char *string;
 #ifndef BOOLEAN
 #define BOOLEAN
 
-typedef enum {FALSE, TRUE} boolean;
+typedef enum { FALSE, TRUE } boolean;
 
 #endif // !BOOLEAN
+
 
 #ifndef HISTORY
 #define HISTORY
@@ -111,7 +105,7 @@ struct Room
 	RoomWall Wall[4];
 	EventPtr event;
 	OmenPtr omen;
-	struct Room *Up, *Down, *Left, *Right, *Above, *Below;
+	struct Room *UpRoom, *DownRoom, *LeftRoom, *RightRoom, *AboveRoom, *BelowRoom;
 };
 
 typedef struct Room Room, *RoomPtr;
@@ -240,3 +234,51 @@ struct Master
 typedef struct Master Master;
 
 #endif // !MASTER
+
+#ifndef SIGNATURES
+#define SIGNATURES
+
+struct Minion;
+struct Omen;
+struct Item;
+struct Event;
+struct Character;
+struct Card;
+
+
+#pragma region CONSTRUCTORS
+
+CardPtr CreateDatabase(void);
+MapPtr CreateMap(Floor mapFloor);
+CharacterPtr CreateChar(string name, int might, int speed, int sanity, int inteligence);
+EventPtr CreateEvent(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
+OmenPtr CreateOmen(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
+ItemPtr CreateItem(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
+
+#pragma endregion
+
+#pragma region ROLLS / STATS
+
+unsigned int DiceRoll(int stat);
+
+#pragma endregion
+
+#pragma region ITEM / MINION ASSIGNMENT
+
+CharacterPtr AsignMinion(CharacterPtr player, MinionPtr minion);
+boolean UnasignMinion(CharacterPtr player, MinionPtr minion);
+CharacterPtr AsignItem(CharacterPtr player, ItemPtr item);
+boolean UnasignItem(CharacterPtr player, ItemPtr item);
+
+#pragma endregion
+
+#pragma region DATABASE
+
+void AddCards(Card c);
+void LoadCards(Card c);
+
+#pragma endregion
+
+
+#endif // !SIGNATURES
+

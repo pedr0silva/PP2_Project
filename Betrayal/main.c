@@ -18,6 +18,8 @@ Date Log:
 int main(void)
 {
 
+	CardPtr database = CreateDatabase();
+	AddCards(*database);
 
 	return 0;
 }
