@@ -18,6 +18,7 @@ Date Log:
 int main(void)
 {
 
+	int aux = Menu();
 	CardPtr database = CreateDatabase();
 	AddCards(*database);
 

@@ -32,6 +32,18 @@ Date Log:
 #define MAX_ROOMS 44
 
 //------------------------------------GENERALS-------------------------------------//
+#ifndef STRUCTSSIGNATURES
+#define STRUCTSSIGNATURES
+
+typedef struct Minion Minion, *MinionPtr;
+typedef struct Omen Omen, *OmenPtr;
+typedef struct Item Item, *ItemPtr;
+typedef struct Event Event, *EventPtr;
+typedef struct Character Character, *CharacterPtr;
+typedef struct Card Card, *CardPtr;
+
+#endif // !SIGNATURES
+
 #ifndef STRING
 #define STRING
 
@@ -141,8 +153,6 @@ struct Minion
 	struct Minion *next;
 };
 
-typedef struct Minion Minion, *MinionPtr;
-
 #endif // !MINION
 
 #ifndef OMEN
@@ -154,8 +164,6 @@ struct Omen
 	int might_mod, speed_mod, sanity_mod, intellect_mod;
 	struct Omen *next;
 };
-
-typedef struct Omen Omen, *OmenPtr;
 
 #endif // !OMEN
 
@@ -169,8 +177,6 @@ struct Item
 	struct Item *next;
 };
 
-typedef struct Item Item, *ItemPtr;
-
 #endif // !ITEM
 
 #ifndef EVENT
@@ -182,8 +188,6 @@ struct Event
 	int might_mod, speed_mod, sanity_mod, intellect_mod;
 	struct Event *next;
 };
-
-typedef struct Event Event, *EventPtr;
 
 #endif // !EVENT
 
@@ -201,8 +205,6 @@ struct Character
 	struct Character *next;
 };
 
-typedef struct Character Character, *CharacterPtr;
-
 #endif // !CHARACTER
 
 #ifndef CARDS
@@ -215,8 +217,6 @@ struct Card
 	Event eventList[MAX_EVENTS];
 	Character characterList[MAX_CHARACTERS];
 };
-
-typedef struct Card Card, *CardPtr;
 
 #endif // !CARDS
 //-----------------------------END-GAME-ITEMS----------------------------------//
@@ -237,14 +237,6 @@ typedef struct Master Master;
 
 #ifndef SIGNATURES
 #define SIGNATURES
-
-struct Minion;
-struct Omen;
-struct Item;
-struct Event;
-struct Character;
-struct Card;
-
 
 #pragma region CONSTRUCTORS
 
@@ -279,6 +271,15 @@ void LoadCards(Card c);
 
 #pragma endregion
 
+#pragma region UI
+#define MAXSTRING 250
+
+char* InitString(char* string);
+char* ReadInput();
+void InputBreak();
+int Menu();
+
+#pragma endregion
+
 
 #endif // !SIGNATURES
-
