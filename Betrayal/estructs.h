@@ -29,7 +29,11 @@ Date Log:
 #define MAX_ITEMS 22
 #define MAX_EVENTS 45
 #define MAX_CHARACTERS 12
-#define MAX_ROOMS 44
+#define MAX_ROOMS_X 10
+#define MAX_ROOMS_Y 10
+#define MAX_ROOMS_Z 3
+#define MAX_WIDTH 120
+#define MAX_HEIGHT 30
 
 //------------------------------------GENERALS-------------------------------------//
 #ifndef STRUCTSSIGNATURES
@@ -113,10 +117,14 @@ typedef struct roomWall RoomWall;
 
 struct Room
 {
+	unsigned int x;
+	unsigned int y;
+	unsigned int z;
 	string name;
 	RoomWall Wall[4];
 	EventPtr event;
 	OmenPtr omen;
+	//Floor roomFloor;
 	struct Room *UpRoom, *DownRoom, *LeftRoom, *RightRoom, *AboveRoom, *BelowRoom;
 };
 
@@ -129,11 +137,12 @@ typedef struct Room Room, *RoomPtr;
 
 struct Map
 {
-	Floor mapFloor;
-	RoomPtr roomList;
+	//Floor mapFloor;
+	//RoomPtr roomList;
+	Room roomList[MAX_ROOMS_X][MAX_ROOMS_Y][MAX_ROOMS_Z];
 	int roomCounter;
-	struct Map *next;
-	struct Map *prev;
+	//struct Map *next;
+	//struct Map *prev;
 };
 
 typedef struct Map Map, *MapPtr;
@@ -274,8 +283,9 @@ void LoadCards(Card c);
 #pragma region UI
 #define MAXSTRING 250
 
-char* InitString(char* string);
-char* ReadInput();
+string InitString(string string);
+string ToUpper(string string);
+string ReadInput();
 void InputBreak();
 int Menu();
 

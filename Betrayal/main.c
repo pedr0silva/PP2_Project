@@ -12,11 +12,12 @@ Email:
 Date Log:
 */
 
-#include <stdio.h>
 #include "estructs.h"
 
 int main(void)
 {
+	char DrawingTable[MAX_HEIGHT][MAX_WIDTH];
+
 
 	int aux = Menu();
 	CardPtr database = CreateDatabase();

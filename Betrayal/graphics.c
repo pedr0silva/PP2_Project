@@ -4,7 +4,8 @@
 #include <ctype.h>
 #include <conio.h>
 
-char* InitString(char* string)
+
+string InitString(string string)
 {
 	for (int i = 0; i < MAXSTRING; i++)
 	{
@@ -12,7 +13,7 @@ char* InitString(char* string)
 	}
 	return string;
 }
-char* ToUpper(char* string)
+string ToUpper(string string)
 {
 	for (int i = 0; string[i] != '\0'; i++)
 	{
@@ -20,7 +21,7 @@ char* ToUpper(char* string)
 	}
 	return string;
 }
-char* ReadInput()
+string ReadInput()
 {
 	char input[MAXSTRING];
 	InitString(input);
@@ -28,13 +29,25 @@ char* ReadInput()
 	gets(input);
 	ToUpper(input);
 
-	return input;
+	return (string)input;
 }
 void InputBreak()
 {
 	printf("Press a key to continue.");
 	getchar();
 	system("cls");
+}
+
+int UpdateMap(Master *mainStruct, char mapText[MAX_HEIGHT][MAX_WIDTH])
+{
+
+}
+int DrawMap(char map[MAX_HEIGHT][MAX_WIDTH])
+{
+	char aux;
+	for (int i = 0; i < MAX_HEIGHT; i++)
+		for (int j = 0; i < MAX_WIDTH; j++)
+			printf("%c", map[i][j]);
 }
 int Menu()
 {

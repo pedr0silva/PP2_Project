@@ -32,39 +32,92 @@ CardPtr CreateDatabase(void)
 	return aux;
 }
 
-//Allocates memory for a Map and gives value to it's atributes.
+//Allocates memory for a Map and gives value to its atributes.
 MapPtr CreateMap(Floor mapFloor)
 {
 	MapPtr aux = (MapPtr)malloc(sizeof(Map));
 
-	aux->mapFloor = mapFloor;
-	aux->roomList = NULL;
+	//aux->mapFloor = mapFloor;
+	//aux->roomList = NULL;
 	aux->roomCounter = 0;
-	aux->next = NULL;
-	aux->prev = NULL;
+	//aux->next = NULL;
+	//aux->prev = NULL;
 
 	return aux;
 }
+////Adds a Map to a MapList.
+//MapPtr AddMapToList(MapPtr head, MapPtr node)
+//{
+//	CharacterPtr aux = head;
+//	CharacterPtr aux2 = aux;
+//	if (head == NULL)
+//		head == node;
+//	else
+//	{
+//		while (aux)
+//		{
+//			aux2 = aux;
+//			aux = aux->next;
+//		}
+//		aux2->next = node;
+//		node->next = aux;
+//	}
+//	return head;
+//}
+////Removes a Map from a MapList.
+//MapPtr RemoveMapFromList(MapPtr head, Floor floor)
+//{
+//	CharacterPtr aux = head;
+//	CharacterPtr aux2 = aux;
+//	if (head != NULL)
+//	{
+//		while (aux)
+//		{
+//			if (head->mapFloor == floor)
+//			{
+//				aux2->next = aux->next;
+//				free(aux);
+//				break;
+//			}
+//			aux2 = aux;
+//			aux = aux->next;
+//		}
+//	}
+//	return head;
+//}
 
-//Allocates memory for a Room and gives value to it's atributes.
-/*RoomPtr CreateRoom(string roomName, EventPtr roomEvent, OmenPtr roomOmen)
+
+//Allocates memory for a Room and gives value to its atributes.
+RoomPtr CreateRoom(string roomName, EventPtr roomEvent, OmenPtr roomOmen)
 {
 	RoomPtr aux = (RoomPtr)malloc(sizeof(Room));
 
+	aux->x = 0;
+	aux->y = 0;
+	aux->z = 0;
 	aux->name = roomName;
 	aux->event = roomEvent;
 	aux->omen = roomOmen;
-	aux->next = NULL;
+	aux->UpRoom = NULL;
+	aux->DownRoom = NULL;
+	aux->LeftRoom = NULL;
+	aux->RightRoom = NULL;
+	aux->BelowRoom = NULL;
+	aux->AboveRoom = NULL;
 
 	return aux;
-}*/
+}
+RoomPtr AddRoomToList(RoomPtr currentRoom, Direction direction, RoomPtr nodeRoom)
+{
 
-//Allocates memory for a Character and gives value to it's atributes.
+}
+
+//Allocates memory for a Character and gives value to its atributes.
 CharacterPtr CreateChar(string name, int might, int speed, int sanity, int inteligence)
 {
 	CharacterPtr aux = (CharacterPtr)malloc(sizeof(Character));
 
-	aux->name = name;
+	aux->name = ToUpper(name);
 	aux->might = might;
 	aux->speed = speed;
 	aux->sanity = sanity;
@@ -77,14 +130,54 @@ CharacterPtr CreateChar(string name, int might, int speed, int sanity, int intel
 
 	return aux;
 }
+//Adds a Character to a CharacterList.
+CharacterPtr AddCharToList(CharacterPtr head, CharacterPtr node)
+{
+	CharacterPtr aux = head;
+	CharacterPtr aux2 = aux;
+	if (head == NULL)
+		head == node;
+	else
+	{
+		while (aux && strcmp(aux->name, node->name) > 0)
+		{
+			aux2 = aux;
+			aux = aux->next;
+		}
+		aux2->next = node;
+		node->next = aux;
+	}
+	return head;
+}
+//Removes a Character from a CharacterList.
+CharacterPtr RemoveCharFromList(CharacterPtr head, string name)
+{
+	CharacterPtr aux = head;
+	CharacterPtr aux2 = aux;
+	if (head != NULL)
+	{
+		while (aux)
+		{
+			if (strcmp(aux->name, name) != 0)
+			{
+				aux2->next = aux->next;
+				free(aux);
+				break;
+			}
+			aux2 = aux;
+			aux = aux->next;
+		}
+	}
+	return head;
+}
 
-//Allocates memory for an Event and gives value to it's atributes.
+//Allocates memory for an Event and gives value to its atributes.
 EventPtr CreateEvent(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod)
 {
 	EventPtr aux = (EventPtr)malloc(sizeof(Event));
 
-	aux->name = name;
-	aux->description = description;
+	aux->name = ToUpper(name);
+	aux->description = ToUpper(description);
 	aux->might_mod = might_mod;
 	aux->speed_mod = speed_mod;
 	aux->sanity_mod = sanity_mod;
@@ -93,14 +186,110 @@ EventPtr CreateEvent(string name, string description, int might_mod, int speed_m
 
 	return aux;
 }
+//Adds an Event to an EventList.
+EventPtr AddEventToList(EventPtr head, EventPtr node)
+{
+	EventPtr aux = head;
+	EventPtr aux2 = aux;
+	if (head == NULL)
+		head == node;
+	else
+	{
+		while (aux && strcmp(aux->name, node->name) > 0)
+		{
+			aux2 = aux;
+			aux = aux->next;
+		}
+		aux2->next = node;
+		node->next = aux;
+	}
+	return head;
+}
+//Removes an Event from an EventList.
+EventPtr RemoveEventFromList(EventPtr head, string name)
+{
+	EventPtr aux = head;
+	EventPtr aux2 = aux;
+	if (head != NULL)
+	{
+		while (aux)
+		{
+			if (strcmp(aux->name, name) != 0)
+			{
+				aux2->next = aux->next;
+				free(aux);
+				break;
+			}
+			aux2 = aux;
+			aux = aux->next;
+		}
+	}
+	return head;
+}
 
-//Allocates memory for an Omen and gives value to it's atributes.
+//Allocates memory for an Omen and gives value to its atributes.
 OmenPtr CreateOmen(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod)
 {
 	OmenPtr aux = (OmenPtr)malloc(sizeof(Omen));
 
-	aux->name = name;
-	aux->description = description;
+	aux->name = ToUpper(name);
+	aux->description = ToUpper(description);
+	aux->might_mod = might_mod;
+	aux->speed_mod = speed_mod;
+	aux->sanity_mod = sanity_mod;
+	aux->intellect_mod = inteligence_mod;
+	aux->next = NULL;
+
+	return aux;
+}//Adds an Event to an EventList.
+ //Adds an Omen to an OmenList.
+OmenPtr AddOmenToList(OmenPtr head, OmenPtr node)
+{
+	OmenPtr aux = head;
+	OmenPtr aux2 = aux;
+	if (head == NULL)
+		head == node;
+	else
+	{
+		while (aux && strcmp(aux->name, node->name) > 0)
+		{
+			aux2 = aux;
+			aux = aux->next;
+		}
+		aux2->next = node;
+		node->next = aux;
+	}
+	return head;
+}
+//Removes an Omen from an OmenList.
+OmenPtr RemoveOmenFromList(OmenPtr head, string name)
+{
+	OmenPtr aux = head;
+	OmenPtr aux2 = aux;
+	if (head != NULL)
+	{
+		while (aux)
+		{
+			if (strcmp(aux->name, name) != 0)
+			{
+				aux2->next = aux->next;
+				free(aux);
+				break;
+			}
+			aux2 = aux;
+			aux = aux->next;
+		}
+	}
+	return head;
+}
+
+//Allocates memory for an Item and gives value to its atributes.
+ItemPtr CreateItem(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod)
+{
+	ItemPtr aux = (ItemPtr)malloc(sizeof(Item));
+
+	aux->name = ToUpper(name);
+	aux->description = ToUpper(description);
 	aux->might_mod = might_mod;
 	aux->speed_mod = speed_mod;
 	aux->sanity_mod = sanity_mod;
@@ -109,21 +298,45 @@ OmenPtr CreateOmen(string name, string description, int might_mod, int speed_mod
 
 	return aux;
 }
-
-//Allocates memory for an Item and gives value to it's atributes.
-ItemPtr CreateItem(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod)
+//Adds an Item to an ItemList.
+ItemPtr AddItemToList(ItemPtr head, OmenPtr node)
 {
-	ItemPtr aux = (ItemPtr)malloc(sizeof(Item));
-
-	aux->name = name;
-	aux->description = description;
-	aux->might_mod = might_mod;
-	aux->speed_mod = speed_mod;
-	aux->sanity_mod = sanity_mod;
-	aux->intellect_mod = inteligence_mod;
-	aux->next = NULL;
-
-	return aux;
+	ItemPtr aux = head;
+	ItemPtr aux2 = aux;
+	if (head == NULL)
+		head == node;
+	else
+	{
+		while (aux && strcmp(aux->name, node->name) > 0)
+		{
+			aux2 = aux;
+			aux = aux->next;
+		}
+		aux2->next = node;
+		node->next = aux;
+	}
+	return head;
+}
+//Removes an Item from an ItemList.
+ItemPtr RemoveItemFromList(ItemPtr head, string name)
+{
+	ItemPtr aux = head;
+	ItemPtr aux2 = aux;
+	if (head != NULL)
+	{
+		while (aux)
+		{
+			if (strcmp(aux->name, name) != 0)
+			{
+				aux2->next = aux->next;
+				free(aux);
+				break;
+			}
+			aux2 = aux;
+			aux = aux->next;
+		}
+	}
+	return head;
 }
 
 //Gets a random number off a given stat
@@ -139,8 +352,8 @@ unsigned int DiceRoll(int stat)
 	return rv;
 }
 
-//Asigns a minion to a player and applies stat changes
-CharacterPtr AsignMinion(CharacterPtr player, MinionPtr minion)
+//Assigns a minion to a player and applies stat changes.
+CharacterPtr AssignMinion(CharacterPtr player, MinionPtr minion)
 {
 	MinionPtr aux = player->minions;
 
@@ -162,9 +375,8 @@ CharacterPtr AsignMinion(CharacterPtr player, MinionPtr minion)
 
 	return player;
 }
-
-//Unasign a minion to a player and removes the stat changes applied previously by that minion
-boolean UnasignMinion(CharacterPtr player, MinionPtr minion)
+//Unassign a minion to a player and removes the stat changes applied previously by that minion.
+boolean UnassignMinion(CharacterPtr player, MinionPtr minion)
 {
 	MinionPtr aux = player->minions;
 	MinionPtr aux2 = aux;
@@ -195,8 +407,8 @@ boolean UnasignMinion(CharacterPtr player, MinionPtr minion)
 	}
 }
 
-//Asigns an item to a player and applies stat changes
-CharacterPtr AsignItem(CharacterPtr player, ItemPtr item)
+//Assigns an item to a player and applies stat changes.
+CharacterPtr AssignItem(CharacterPtr player, ItemPtr item)
 {
 	ItemPtr aux = player->items;
 
@@ -218,9 +430,8 @@ CharacterPtr AsignItem(CharacterPtr player, ItemPtr item)
 
 	return player;
 }
-
-//Unasign an item to a player and removes the stat changes applied previously by that item
-boolean UnasignItem(CharacterPtr player, ItemPtr item)
+//Unassign an item to a player and removes the stat changes applied previously by that item.
+boolean UnassignItem(CharacterPtr player, ItemPtr item)
 {
 	ItemPtr aux = player->items;
 	ItemPtr aux2 = aux;
