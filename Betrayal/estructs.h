@@ -124,8 +124,6 @@ struct Room
 	RoomWall Wall[4];
 	EventPtr event;
 	OmenPtr omen;
-	//Floor roomFloor;
-	struct Room *UpRoom, *DownRoom, *LeftRoom, *RightRoom, *AboveRoom, *BelowRoom;
 };
 
 typedef struct Room Room, *RoomPtr;
@@ -205,6 +203,9 @@ struct Event
 
 struct Character
 {
+	unsigned int x;
+	unsigned int y;
+	unsigned int z;
 	string name;
 	int might, speed, sanity, inteligence;
 	MinionPtr minions;

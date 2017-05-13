@@ -37,6 +37,12 @@ MapPtr CreateMap(Floor mapFloor)
 {
 	MapPtr aux = (MapPtr)malloc(sizeof(Map));
 
+	for(int x = 0; x < MAX_ROOMS_X; x++)
+		for(int y = 0; y < MAX_ROOMS_Y; y++)
+			for (int z = 0; z < MAX_ROOMS_Z; z++)
+			{
+				aux->roomList[x][y][z] = NULL;
+			}
 	//aux->mapFloor = mapFloor;
 	//aux->roomList = NULL;
 	aux->roomCounter = 0;
@@ -98,18 +104,33 @@ RoomPtr CreateRoom(string roomName, EventPtr roomEvent, OmenPtr roomOmen)
 	aux->name = roomName;
 	aux->event = roomEvent;
 	aux->omen = roomOmen;
-	aux->UpRoom = NULL;
+	/*aux->UpRoom = NULL;
 	aux->DownRoom = NULL;
 	aux->LeftRoom = NULL;
 	aux->RightRoom = NULL;
 	aux->BelowRoom = NULL;
-	aux->AboveRoom = NULL;
+	aux->AboveRoom = NULL;*/
 
 	return aux;
 }
-RoomPtr AddRoomToList(RoomPtr currentRoom, Direction direction, RoomPtr nodeRoom)
+RoomPtr OpenRoom(Map *map, RoomPtr currentRoom, Direction direction, RoomPtr nodeRoom)
 {
-
+	if (direction = Up)
+	{
+		map->roomList[currentRoom->x][currentRoom->y + 1][currentRoom->z] = nodeRoom;
+	}
+	if (direction = Left)
+	{
+		map->roomList[currentRoom->x - 1][currentRoom->y][currentRoom->z] = nodeRoom;
+	}
+	if (direction = Down)
+	{
+		map->roomList[currentRoom->x][currentRoom->y - 1][currentRoom->z] = nodeRoom;
+	}
+	if (direction = Right)
+	{
+		map->roomList[currentRoom->x - 1][currentRoom->y][currentRoom->z] = nodeRoom;
+	}
 }
 
 //Allocates memory for a Character and gives value to its atributes.
