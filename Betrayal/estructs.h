@@ -62,7 +62,6 @@ typedef enum { FALSE, TRUE } boolean;
 
 #endif // !BOOLEAN
 
-
 #ifndef HISTORY
 #define HISTORY
 
@@ -75,6 +74,20 @@ struct History
 typedef struct History History, *HistoryPtr;
 
 #endif // !HISTORY
+
+#ifndef POSITION
+#define POSITION
+
+struct vector3
+{
+	unsigned int x;
+	unsigned int y;
+	unsigned int z;
+};
+
+typedef struct vector3 Vector3, Vector3Ptr;
+#endif // !POSITION
+
 
 //-----------------------------------END-GENERALS-------------------------------------//
 
@@ -117,9 +130,7 @@ typedef struct roomWall RoomWall;
 
 struct Room
 {
-	unsigned int x;
-	unsigned int y;
-	unsigned int z;
+	Vector3 position;
 	string name;
 	RoomWall Wall[4];
 	EventPtr event;
@@ -203,9 +214,7 @@ struct Event
 
 struct Character
 {
-	unsigned int x;
-	unsigned int y;
-	unsigned int z;
+	Vector3 position;
 	string name;
 	int might, speed, sanity, inteligence;
 	MinionPtr minions;

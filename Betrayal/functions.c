@@ -98,9 +98,9 @@ RoomPtr CreateRoom(string roomName, EventPtr roomEvent, OmenPtr roomOmen)
 {
 	RoomPtr aux = (RoomPtr)malloc(sizeof(Room));
 
-	aux->x = 0;
-	aux->y = 0;
-	aux->z = 0;
+	aux->position.x = 0;
+	aux->position.y = 0;
+	aux->position.z = 0;
 	aux->name = roomName;
 	aux->event = roomEvent;
 	aux->omen = roomOmen;
@@ -117,19 +117,19 @@ RoomPtr OpenRoom(Map *map, RoomPtr currentRoom, Direction direction, RoomPtr nod
 {
 	if (direction = Up)
 	{
-		map->roomList[currentRoom->x][currentRoom->y + 1][currentRoom->z] = nodeRoom;
+		map->roomList[currentRoom->position.x][currentRoom->position.y + 1][currentRoom->position.z] = nodeRoom;
 	}
 	if (direction = Left)
 	{
-		map->roomList[currentRoom->x - 1][currentRoom->y][currentRoom->z] = nodeRoom;
+		map->roomList[currentRoom->position.x - 1][currentRoom->position.y][currentRoom->position.z] = nodeRoom;
 	}
 	if (direction = Down)
 	{
-		map->roomList[currentRoom->x][currentRoom->y - 1][currentRoom->z] = nodeRoom;
+		map->roomList[currentRoom->position.x][currentRoom->position.y - 1][currentRoom->position.z] = nodeRoom;
 	}
 	if (direction = Right)
 	{
-		map->roomList[currentRoom->x - 1][currentRoom->y][currentRoom->z] = nodeRoom;
+		map->roomList[currentRoom->position.x - 1][currentRoom->position.y][currentRoom->position.z] = nodeRoom;
 	}
 }
 
@@ -138,6 +138,9 @@ CharacterPtr CreateChar(string name, int might, int speed, int sanity, int intel
 {
 	CharacterPtr aux = (CharacterPtr)malloc(sizeof(Character));
 
+	aux->position.x = 0;
+	aux->position.y = 0;
+	aux->position.z = 0;
 	aux->name = ToUpper(name);
 	aux->might = might;
 	aux->speed = speed;
