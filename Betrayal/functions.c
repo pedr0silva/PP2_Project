@@ -32,17 +32,92 @@ CardPtr CreateDatabase(void)
 	return aux;
 }
 
+//Allocates memory for a Room and gives value to its atributes.
+RoomPtr CreateRoom(string roomName, EventPtr roomEvent, OmenPtr roomOmen)
+{
+	RoomPtr aux = (RoomPtr)malloc(sizeof(Room));
+
+	aux->position.x = 0;
+	aux->position.y = 0;
+	aux->position.z = 0;
+	aux->name = roomName;
+	aux->event = roomEvent;
+	aux->omen = roomOmen;
+	/*aux->UpRoom = NULL;
+	aux->DownRoom = NULL;
+	aux->LeftRoom = NULL;
+	aux->RightRoom = NULL;
+	aux->BelowRoom = NULL;
+	aux->AboveRoom = NULL;*/
+
+	return aux;
+}
+RoomPtr OpenRoom(Map *map, RoomPtr currentRoom, Direction direction, RoomPtr nodeRoom)
+{
+
+}
+
+//Allocates memory for a Floor and gives value to its atributes.
+FloorPtr CreateFloor(FloorLevel level)
+{
+	FloorPtr aux = (FloorPtr)malloc(sizeof(Floor));
+	aux->level = level;
+	aux->roomList = NULL;
+	aux->next = NULL;
+	return aux;
+}
+//Adds a Floor to a FloorList.
+FloorPtr AddFloorToList(FloorPtr head, FloorPtr node)
+{
+	FloorPtr aux = head;
+	FloorPtr aux2 = aux;
+	if (head == NULL)
+		head == node;
+	else
+	{
+		while (aux)
+		{
+			aux2 = aux;
+			aux = aux->next;
+		}
+		aux2->next = node;
+		node->next = aux;
+	}
+	return head;
+}
+//Removes a Floor from a FloorList.
+FloorPtr RemoveFloorFromList(FloorPtr head, FloorLevel level)
+{
+	FloorPtr aux = head;
+	FloorPtr aux2 = aux;
+	if (head != NULL)
+	{
+		while (aux)
+		{
+			if (aux->level == level)
+			{
+				aux2->next = aux->next;
+				free(aux);
+				break;
+			}
+			aux2 = aux;
+			aux = aux->next;
+		}
+	}
+	return head;
+}
+
 //Allocates memory for a Map and gives value to its atributes.
-MapPtr CreateMap(Floor mapFloor)
+MapPtr CreateMap()
 {
 	MapPtr aux = (MapPtr)malloc(sizeof(Map));
+	FloorPtr basement = CreateFloor(BASEMENT);
+	FloorPtr ground = CreateFloor(GROUND);
+	FloorPtr upper = CreateFloor(UPPER);
 
-	for(int x = 0; x < MAX_ROOMS_X; x++)
-		for(int y = 0; y < MAX_ROOMS_Y; y++)
-			for (int z = 0; z < MAX_ROOMS_Z; z++)
-			{
-				aux->roomList[x][y][z] = NULL;
-			}
+	aux->mapFloor = AddFloorToList(aux->mapFloor, basement);
+	aux->mapFloor = AddFloorToList(aux->mapFloor, ground);
+	aux->mapFloor = AddFloorToList(aux->mapFloor, upper);
 	//aux->mapFloor = mapFloor;
 	//aux->roomList = NULL;
 	aux->roomCounter = 0;
@@ -91,47 +166,6 @@ MapPtr CreateMap(Floor mapFloor)
 //	}
 //	return head;
 //}
-
-
-//Allocates memory for a Room and gives value to its atributes.
-RoomPtr CreateRoom(string roomName, EventPtr roomEvent, OmenPtr roomOmen)
-{
-	RoomPtr aux = (RoomPtr)malloc(sizeof(Room));
-
-	aux->position.x = 0;
-	aux->position.y = 0;
-	aux->position.z = 0;
-	aux->name = roomName;
-	aux->event = roomEvent;
-	aux->omen = roomOmen;
-	/*aux->UpRoom = NULL;
-	aux->DownRoom = NULL;
-	aux->LeftRoom = NULL;
-	aux->RightRoom = NULL;
-	aux->BelowRoom = NULL;
-	aux->AboveRoom = NULL;*/
-
-	return aux;
-}
-RoomPtr OpenRoom(Map *map, RoomPtr currentRoom, Direction direction, RoomPtr nodeRoom)
-{
-	if (direction = Up)
-	{
-		map->roomList[currentRoom->position.x][currentRoom->position.y + 1][currentRoom->position.z] = nodeRoom;
-	}
-	if (direction = Left)
-	{
-		map->roomList[currentRoom->position.x - 1][currentRoom->position.y][currentRoom->position.z] = nodeRoom;
-	}
-	if (direction = Down)
-	{
-		map->roomList[currentRoom->position.x][currentRoom->position.y - 1][currentRoom->position.z] = nodeRoom;
-	}
-	if (direction = Right)
-	{
-		map->roomList[currentRoom->position.x - 1][currentRoom->position.y][currentRoom->position.z] = nodeRoom;
-	}
-}
 
 //Allocates memory for a Character and gives value to its atributes.
 CharacterPtr CreateChar(string name, int might, int speed, int sanity, int inteligence)

@@ -88,16 +88,9 @@ struct vector3
 typedef struct vector3 Vector3, Vector3Ptr;
 #endif // !POSITION
 
-
 //-----------------------------------END-GENERALS-------------------------------------//
 
 //------------------------------------MAP-------------------------------------//
-#ifndef FLOOR
-#define FLOOR
-
-typedef enum { BASEMENT = -1, GROUND, UPPER } Floor;
-
-#endif // !FLOOR
 
 #ifndef DIRECTION
 #define DIRECTION
@@ -141,15 +134,30 @@ typedef struct Room Room, *RoomPtr;
 
 #endif // !ROOM
 
+#ifndef FLOOR
+#define FLOOR
+
+typedef enum { BASEMENT = -1, GROUND, UPPER } FloorLevel;
+
+struct floor
+{
+	FloorLevel level;
+	RoomPtr roomList;
+	struct floor *next;
+};
+typedef struct floor Floor, *FloorPtr;
+
+#endif // !FLOOR
+
 #ifndef MAP
 #define MAP
 
 struct Map
 {
-	//Floor mapFloor;
-	//RoomPtr roomList;
-	Room roomList[MAX_ROOMS_X][MAX_ROOMS_Y][MAX_ROOMS_Z];
 	int roomCounter;
+	FloorPtr mapFloor;
+	//RoomPtr roomList;
+	//Room roomList[MAX_ROOMS_X][MAX_ROOMS_Y][MAX_ROOMS_Z];
 	//struct Map *next;
 	//struct Map *prev;
 };

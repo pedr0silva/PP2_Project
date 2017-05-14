@@ -38,11 +38,11 @@ void InputBreak()
 	system("cls");
 }
 
-int UpdateMap(Master *mainStruct, char mapText[MAX_HEIGHT][MAX_WIDTH])
+int UpdateMap(Master *mainStruct, char *mapText[MAX_HEIGHT][MAX_WIDTH])
 {
 
 }
-int DrawMap(char map[MAX_HEIGHT][MAX_WIDTH])
+int DrawMap(char *map[MAX_HEIGHT][MAX_WIDTH])
 {
 	char aux;
 	for (int i = 0; i < MAX_HEIGHT; i++)
