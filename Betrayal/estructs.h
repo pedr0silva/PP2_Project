@@ -18,7 +18,7 @@ Date Log:
 		   - Minor Fixes.
 ------------//---------------//------------//---------------//------------//---------------
 Name: Diogo Portela
-Email: 
+Email:
 Date Log:
 27/04/2017 - Minor Fixes
 */
@@ -34,6 +34,7 @@ Date Log:
 #define MAX_ROOMS_Z 3
 #define MAX_WIDTH 120
 #define MAX_HEIGHT 30
+#define WALL_NUMBER 4
 
 //------------------------------------GENERALS-------------------------------------//
 #ifndef STRUCTSSIGNATURES
@@ -80,9 +81,9 @@ typedef struct History History, *HistoryPtr;
 
 struct vector3
 {
-	unsigned int x;
-	unsigned int y;
-	unsigned int z;
+	int x;
+	int y;
+	int z;
 };
 
 typedef struct vector3 Vector3, Vector3Ptr;
@@ -95,14 +96,14 @@ typedef struct vector3 Vector3, Vector3Ptr;
 #ifndef DIRECTION
 #define DIRECTION
 
-typedef enum direction { Up, Right, Down, Left } Direction;
+typedef enum direction { Up, Right, Down, Left, Above, Bellow } Direction;
 
 #endif // !DIRECTION
 
 #ifndef WALLTYPE
 #define WALLTYPE
 
-typedef enum wallType { Empy, Door, Window } WallType;
+typedef enum wallType { Empty, Door, Window } WallType;
 
 #endif // !WALLTYPE
 
@@ -115,7 +116,8 @@ struct roomWall
 	WallType WallType;
 };
 
-typedef struct roomWall RoomWall;
+typedef struct roomWall RoomWall, *RoomWallPtr;
+
 #endif // !ROOMWALL
 
 #ifndef ROOM
@@ -124,10 +126,12 @@ typedef struct roomWall RoomWall;
 struct Room
 {
 	Vector3 position;
+	int positionLenght;
 	string name;
-	RoomWall Wall[4];
+	RoomWall wall[WALL_NUMBER];
 	EventPtr event;
 	OmenPtr omen;
+	struct Room *next;
 };
 
 typedef struct Room Room, *RoomPtr;

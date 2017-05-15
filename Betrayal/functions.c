@@ -28,33 +28,175 @@ Date Log:
 CardPtr CreateDatabase(void)
 {
 	CardPtr aux = (CardPtr)malloc(sizeof(Card));
-	
+
 	return aux;
 }
 
+//Assigns values to all four walls of a room.
+boolean AssignWalls(RoomWallPtr arr, WallType upType, WallType leftType, WallType downType, WallType rightType)
+{
+	RoomWall aux;
+	aux.Direction = Up;
+	aux.WallType = upType;
+	arr[0] = aux;
+
+	aux.Direction = Left;
+	aux.WallType = leftType;
+	arr[1] = aux;
+
+	aux.Direction = Down;
+	aux.WallType = downType;
+	arr[2] = aux;
+
+	aux.Direction = Right;
+	aux.WallType = rightType;
+	arr[3] = aux;
+
+	return TRUE;
+}
+//Returns the wall of that direction in that room.
+RoomWallPtr FindWallDirection(RoomPtr room, Direction direction)
+{
+	RoomWallPtr aux = NULL;
+	if (direction == Up)
+		aux = room->wall;
+	else if (direction == Left)
+		aux = &(room->wall[1]);
+	else if (direction == Down)
+		aux = &(room->wall[2]);
+	else if (direction == Right)
+		aux = &(room->wall[3]);
+	return aux;
+}
+//Copies the walls from one room to the other.
+boolean CopyWalls(RoomWallPtr thisRoomWalls, RoomWallPtr otherRoomWalls)
+{
+	for (int i = 0; i < WALL_NUMBER; i++)
+	{
+		thisRoomWalls[i] = otherRoomWalls[i];
+	}
+	return TRUE;
+}
+//Rotates the walls of a room. Value > 0 clockwise; Value < 0 counter-clockwise.
+RoomPtr RotateWalls(RoomPtr room, int value)
+{
+	if (value > 0)
+	{
+		RoomWall aux = room->wall[0];
+		room->wall[0] = room->wall[1];
+		room->wall[1] = room->wall[2];
+		room->wall[2] = room->wall[3];
+		room->wall[3] = aux;
+	}
+	if (value < 0)
+	{
+		RoomWall aux = room->wall[0];
+		room->wall[0] = room->wall[3];
+		room->wall[3] = room->wall[2];
+		room->wall[2] = room->wall[1];
+		room->wall[1] = aux;
+	}
+
+	return room;
+}
+
 //Allocates memory for a Room and gives value to its atributes.
-RoomPtr CreateRoom(string roomName, EventPtr roomEvent, OmenPtr roomOmen)
+RoomPtr CreateRoom(string roomName, EventPtr roomEvent, OmenPtr roomOmen, WallType upType, WallType leftType, WallType downType, WallType rightType)
 {
 	RoomPtr aux = (RoomPtr)malloc(sizeof(Room));
 
 	aux->position.x = 0;
 	aux->position.y = 0;
 	aux->position.z = 0;
+	aux->positionLenght = 0;
 	aux->name = roomName;
 	aux->event = roomEvent;
 	aux->omen = roomOmen;
-	/*aux->UpRoom = NULL;
-	aux->DownRoom = NULL;
-	aux->LeftRoom = NULL;
-	aux->RightRoom = NULL;
-	aux->BelowRoom = NULL;
-	aux->AboveRoom = NULL;*/
+	aux->next = NULL;
+	boolean i = AssignWalls(&(aux->wall), upType, leftType, downType, rightType);
 
 	return aux;
 }
-RoomPtr OpenRoom(Map *map, RoomPtr currentRoom, Direction direction, RoomPtr nodeRoom)
+//Creates a copy of a room to use in a game.
+RoomPtr InstanciateRoom(RoomPtr room, Vector3 position)
 {
+	RoomPtr aux = (RoomPtr)malloc(sizeof(Room));
+	aux->event = room->event;
+	aux->name = room->name;
+	aux->omen = room->omen;
+	aux->position = position;
+	aux->positionLenght = aux->position.x + aux->position.y;
+	aux->next = NULL;
+	boolean i = CopyWalls(aux->wall, room->wall);
 
+	if (i == TRUE)
+		return aux;
+	return NULL;
+}
+//Adds a Room to a RoomList.
+RoomPtr AddRoomToList(RoomPtr head, RoomPtr node)
+{
+	RoomPtr aux = head;
+	RoomPtr aux2 = aux;
+
+
+	if (head == NULL)
+		head == node;
+	else
+	{
+		while (aux && aux->positionLenght < node->positionLenght)
+		{
+			aux2 = aux;
+			aux = aux->next;
+		}
+		aux2->next = node;
+		node->next = aux;
+	}
+	return head;
+}
+//Removes a Room from a RoomList.
+RoomPtr RemoveRoomFromList(RoomPtr head, string name)
+{
+	RoomPtr aux = head;
+	RoomPtr aux2 = aux;
+	if (head != NULL)
+	{
+		while (aux)
+		{
+			if (strcmp(aux->name, name) == 0)
+			{
+				aux2->next = aux->next;
+				free(aux);
+				break;
+			}
+			aux2 = aux;
+			aux = aux->next;
+		}
+	}
+	return head;
+}
+//Opens a room and generates ones.
+boolean OpenRoom(FloorPtr floor, RoomPtr currentRoom, Direction direction)
+{
+	RoomWallPtr aux = FindWallDirection(currentRoom, direction);
+	RoomPtr roomAux = NULL;
+
+	if (aux->WallType == Door)
+	{
+		Vector3 addingValue = currentRoom->position;
+		if (direction == Up)
+			addingValue.y++;
+		else if (direction == Left)
+			addingValue.x--;
+		else if (direction == Down)
+			addingValue.y--;
+		else if (direction == Right)
+			addingValue.x++;
+		//needs code here to generate a room.
+		return TRUE;
+	}
+	else
+		return FALSE;
 }
 
 //Allocates memory for a Floor and gives value to its atributes.
@@ -118,54 +260,10 @@ MapPtr CreateMap()
 	aux->mapFloor = AddFloorToList(aux->mapFloor, basement);
 	aux->mapFloor = AddFloorToList(aux->mapFloor, ground);
 	aux->mapFloor = AddFloorToList(aux->mapFloor, upper);
-	//aux->mapFloor = mapFloor;
-	//aux->roomList = NULL;
 	aux->roomCounter = 0;
-	//aux->next = NULL;
-	//aux->prev = NULL;
 
 	return aux;
 }
-////Adds a Map to a MapList.
-//MapPtr AddMapToList(MapPtr head, MapPtr node)
-//{
-//	CharacterPtr aux = head;
-//	CharacterPtr aux2 = aux;
-//	if (head == NULL)
-//		head == node;
-//	else
-//	{
-//		while (aux)
-//		{
-//			aux2 = aux;
-//			aux = aux->next;
-//		}
-//		aux2->next = node;
-//		node->next = aux;
-//	}
-//	return head;
-//}
-////Removes a Map from a MapList.
-//MapPtr RemoveMapFromList(MapPtr head, Floor floor)
-//{
-//	CharacterPtr aux = head;
-//	CharacterPtr aux2 = aux;
-//	if (head != NULL)
-//	{
-//		while (aux)
-//		{
-//			if (head->mapFloor == floor)
-//			{
-//				aux2->next = aux->next;
-//				free(aux);
-//				break;
-//			}
-//			aux2 = aux;
-//			aux = aux->next;
-//		}
-//	}
-//	return head;
-//}
 
 //Allocates memory for a Character and gives value to its atributes.
 CharacterPtr CreateChar(string name, int might, int speed, int sanity, int inteligence)
