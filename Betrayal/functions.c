@@ -31,6 +31,7 @@ CardPtr CreateDatabase(void)
 	return aux;
 }
 
+#pragma region Rooms
 //Assigns values to all four walls of a room.
 boolean AssignWalls(RoomWallPtr arr, WallType upType, WallType leftType, WallType downType, WallType rightType)
 {
@@ -200,7 +201,9 @@ boolean OpenRoom(FloorPtr floor, RoomPtr currentRoom, Direction direction)
 	else
 		return FALSE;
 }
+#pragma endregion
 
+#pragma region Floor
 //Allocates memory for a Floor and gives value to its atributes.
 FloorPtr CreateFloor(FloorLevel level)
 {
@@ -250,6 +253,7 @@ FloorPtr RemoveFloorFromList(FloorPtr head, FloorLevel level)
 	}
 	return head;
 }
+#pragma endregion
 
 //Allocates memory for a Map and gives value to its atributes.
 MapPtr CreateMap()
@@ -266,7 +270,21 @@ MapPtr CreateMap()
 
 	return aux;
 }
+boolean IniticializeMap(MapPtr map)
+{
+	FloorPtr basement = CreateFloor(BASEMENT);
+	FloorPtr ground = CreateFloor(GROUND);
+	FloorPtr upper = CreateFloor(UPPER);
 
+	map->mapFloor = AddFloorToList(map->mapFloor, basement);
+	map->mapFloor = AddFloorToList(map->mapFloor, ground);
+	map->mapFloor = AddFloorToList(map->mapFloor, upper);
+	map->roomCounter = 0;
+
+	return TRUE;
+}
+
+#pragma region Cards
 //Allocates memory for a Character and gives value to its atributes.
 CharacterPtr CreateChar(string name, int might, int speed, int sanity, int inteligence)
 {
@@ -496,6 +514,7 @@ ItemPtr RemoveItemFromList(ItemPtr head, string name)
 	}
 	return head;
 }
+#pragma endregion
 
 //Gets a random number off a given stat
 unsigned int DiceRoll(int stat)
@@ -656,7 +675,6 @@ void AddCharacterCards(Character infoChar[])
 
 	fclose(f);
 }
-
 void AddEventCards(Event infoEvent[])
 {
 	string name, description;
@@ -693,7 +711,6 @@ void AddEventCards(Event infoEvent[])
 
 	fclose(f);
 }
-
 void AddOmenCards(Omen infoOmen[])
 {
 	string name, description;
@@ -731,7 +748,6 @@ void AddOmenCards(Omen infoOmen[])
 
 	fclose(f);
 }
-
 void AddItemCards(Item infoItem[])
 {
 	string name, description;
@@ -767,32 +783,39 @@ void AddItemCards(Item infoItem[])
 	}
 	fclose(f);
 }
-
 //Uses the functions above to ask for card information and add it to the database.
-void AddCards(Card c)
+void AddCards(CardPtr c)
 {
-	AddCharacterCards(c.characterList);
-	AddEventCards(c.eventList);
-	AddOmenCards(c.omenList);
-	AddItemCards(c.itemList);
+	AddCharacterCards(c->characterList);
+	AddEventCards(c->eventList);
+	AddOmenCards(c->omenList);
+	AddItemCards(c->itemList);
 
 	printf("CARDS SAVED...");
 
 }
 
 //Reads from the "cards.bin" file all the cards that compose the game.
-void LoadCards(Card c)
+boolean LoadCards(CardPtr c)
 {
 	FILE *f = fopen("cards.bin", "rb");
-
-	fread(c.characterList, sizeof(Character), MAX_CHARACTERS, f);
-	fread(c.eventList, sizeof(Event), MAX_EVENTS, f);
-	fread(c.omenList, sizeof(Omen), MAX_OMENS, f);
-	fread(c.itemList, sizeof(Item), MAX_ITEMS, f);
-
-	fclose(f);
+	if (f)
+	{
+		fread(c->characterList, sizeof(Character), MAX_CHARACTERS, f);
+		fread(c->eventList, sizeof(Event), MAX_EVENTS, f);
+		fread(c->omenList, sizeof(Omen), MAX_OMENS, f);
+		fread(c->itemList, sizeof(Item), MAX_ITEMS, f);
+		fclose(f);
+		return TRUE;
+	}
+	return FALSE;
 }
 
-
-
 #pragma endregion
+
+MasterPtr LoadMaster(MasterPtr master)
+{
+	master->damageTrack = 0;
+	boolean cards = LoadCards(&(master->Cards));
+	return master;
+}

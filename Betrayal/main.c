@@ -16,8 +16,11 @@ Date Log:
 
 int main(void)
 {
+	//Important variables.
+	Master GameMaster;
 	char DrawingTable[MAX_HEIGHT][MAX_WIDTH];
-	RoomPtr teste = CreateRoom("hello", NULL, NULL, Empty, Empty, Empty, Empty);
+
+	LoadMaster(&GameMaster);
 
 	int aux = Menu();
 	CardPtr database = CreateDatabase();

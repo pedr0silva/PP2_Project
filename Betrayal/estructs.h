@@ -255,10 +255,11 @@ struct Master
 {
 	int damageTrack;
 	CharacterPtr characterList;
-	MapPtr head;
+	Map map;
+	Card Cards;
 };
 
-typedef struct Master Master;
+typedef struct Master Master, *MasterPtr;
 
 #endif // !MASTER
 
@@ -320,8 +321,9 @@ boolean UnassignItem(CharacterPtr player, ItemPtr item);
 
 #pragma region DATABASE
 
-void AddCards(Card c);
-void LoadCards(Card c);
+void AddCards(CardPtr c);
+boolean LoadCards(CardPtr c);
+MasterPtr LoadMaster(MasterPtr master);
 
 #pragma endregion
 
