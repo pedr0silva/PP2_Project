@@ -21,7 +21,6 @@ Date Log:
 
 */
 
-#include <stdio.h>
 #include "estructs.h"
 
 //Allocates memory for database cards.
@@ -105,15 +104,18 @@ RoomPtr CreateRoom(string roomName, EventPtr roomEvent, OmenPtr roomOmen, WallTy
 {
 	RoomPtr aux = (RoomPtr)malloc(sizeof(Room));
 
-	aux->position.x = 0;
-	aux->position.y = 0;
-	aux->position.z = 0;
-	aux->positionLenght = 0;
-	aux->name = roomName;
-	aux->event = roomEvent;
-	aux->omen = roomOmen;
-	aux->next = NULL;
-	boolean i = AssignWalls(&(aux->wall), upType, leftType, downType, rightType);
+	if (aux != NULL)
+	{
+		aux->position.x = 0;
+		aux->position.y = 0;
+		aux->position.z = 0;
+		aux->positionLenght = 0;
+		aux->name = roomName;
+		aux->event = roomEvent;
+		aux->omen = roomOmen;
+		aux->next = NULL;
+		boolean i = AssignWalls(&(aux->wall), upType, leftType, downType, rightType);
+	}
 
 	return aux;
 }

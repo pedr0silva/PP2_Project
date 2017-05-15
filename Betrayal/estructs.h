@@ -86,7 +86,7 @@ struct vector3
 	int z;
 };
 
-typedef struct vector3 Vector3, Vector3Ptr;
+typedef struct vector3 Vector3, *Vector3Ptr;
 #endif // !POSITION
 
 //-----------------------------------END-GENERALS-------------------------------------//
@@ -123,7 +123,7 @@ typedef struct roomWall RoomWall, *RoomWallPtr;
 #ifndef ROOM
 #define ROOM
 
-struct Room
+struct room
 {
 	Vector3 position;
 	int positionLenght;
@@ -134,7 +134,7 @@ struct Room
 	struct Room *next;
 };
 
-typedef struct Room Room, *RoomPtr;
+typedef struct room Room, *RoomPtr;
 
 #endif // !ROOM
 
@@ -160,10 +160,6 @@ struct Map
 {
 	int roomCounter;
 	FloorPtr mapFloor;
-	//RoomPtr roomList;
-	//Room roomList[MAX_ROOMS_X][MAX_ROOMS_Y][MAX_ROOMS_Z];
-	//struct Map *next;
-	//struct Map *prev;
 };
 
 typedef struct Map Map, *MapPtr;
@@ -272,12 +268,39 @@ typedef struct Master Master;
 #pragma region CONSTRUCTORS
 
 CardPtr CreateDatabase(void);
-MapPtr CreateMap(Floor mapFloor);
-CharacterPtr CreateChar(string name, int might, int speed, int sanity, int inteligence);
-EventPtr CreateEvent(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
-OmenPtr CreateOmen(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
-ItemPtr CreateItem(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
 
+boolean AssignWalls(RoomWallPtr arr, WallType upType, WallType leftType, WallType downType, WallType rightType);
+RoomWallPtr FindWallDirection(RoomPtr room, Direction direction);
+boolean CopyWalls(RoomWallPtr thisRoomWalls, RoomWallPtr otherRoomWalls);
+RoomPtr RotateWalls(RoomPtr room, int value);
+
+RoomPtr CreateRoom(string roomName, EventPtr roomEvent, OmenPtr roomOmen, WallType upType, WallType leftType, WallType downType, WallType rightType);
+RoomPtr InstanciateRoom(RoomPtr room, Vector3 position);
+RoomPtr AddRoomToList(RoomPtr head, RoomPtr node);
+RoomPtr RemoveRoomFromList(RoomPtr head, string name);
+boolean OpenRoom(FloorPtr floor, RoomPtr currentRoom, Direction direction);
+
+FloorPtr CreateFloor(FloorLevel level);
+FloorPtr AddFloorToList(FloorPtr head, FloorPtr node);
+FloorPtr RemoveFloorFromList(FloorPtr head, FloorLevel level);
+
+MapPtr CreateMap();
+
+CharacterPtr CreateChar(string name, int might, int speed, int sanity, int inteligence);
+CharacterPtr AddCharToList(CharacterPtr head, CharacterPtr node);
+CharacterPtr RemoveCharFromList(CharacterPtr head, string name);
+
+EventPtr CreateEvent(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
+EventPtr AddEventToList(EventPtr head, EventPtr node);
+EventPtr RemoveEventFromList(EventPtr head, string name);
+
+OmenPtr CreateOmen(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
+OmenPtr AddOmenToList(OmenPtr head, OmenPtr node);
+OmenPtr RemoveOmenFromList(OmenPtr head, string name);
+
+ItemPtr CreateItem(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
+ItemPtr AddItemToList(ItemPtr head, OmenPtr node);
+ItemPtr RemoveItemFromList(ItemPtr head, string name);
 #pragma endregion
 
 #pragma region ROLLS / STATS
@@ -288,10 +311,10 @@ unsigned int DiceRoll(int stat);
 
 #pragma region ITEM / MINION ASSIGNMENT
 
-CharacterPtr AsignMinion(CharacterPtr player, MinionPtr minion);
-boolean UnasignMinion(CharacterPtr player, MinionPtr minion);
-CharacterPtr AsignItem(CharacterPtr player, ItemPtr item);
-boolean UnasignItem(CharacterPtr player, ItemPtr item);
+CharacterPtr AssignMinion(CharacterPtr player, MinionPtr minion);
+boolean UnassignMinion(CharacterPtr player, MinionPtr minion);
+CharacterPtr AssignItem(CharacterPtr player, ItemPtr item);
+boolean UnassignItem(CharacterPtr player, ItemPtr item);
 
 #pragma endregion
 

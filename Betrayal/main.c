@@ -17,11 +17,11 @@ Date Log:
 int main(void)
 {
 	char DrawingTable[MAX_HEIGHT][MAX_WIDTH];
-
+	RoomPtr teste = CreateRoom("hello", NULL, NULL, Empty, Empty, Empty, Empty);
 
 	int aux = Menu();
 	CardPtr database = CreateDatabase();
-	AddCards(*database);
+	//AddCards(*database);
 
 	return 0;
 }
