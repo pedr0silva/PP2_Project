@@ -4,31 +4,32 @@
 #include <conio.h>
 
 
-string InitString(string string)
+stringPtr InitString(stringPtr string)
 {
-	for (int i = 0; i < MAXSTRING; i++)
+	for (int i = 0; i < MAX_STRING; i++)
 	{
 		string[i] = 0;
 	}
 	return string;
 }
-string ToUpper(string string)
+stringPtr ToUpper(string string)
 {
 	for (int i = 0; string[i] != '\0'; i++)
 	{
-		string[i] = toupper(string[i]);
+		string[0] = toupper(aux);
+		//strchr(string[i], (int)toupper(string[i]));
 	}
 	return string;
 }
-string ReadInput()
+stringPtr ReadInput()
 {
-	char input[MAXSTRING];
+	char input[MAX_STRING];
 	InitString(input);
 	printf("Input: ");
 	gets(input);
 	ToUpper(input);
 
-	return (string)input;
+	return (stringPtr)input;
 }
 void InputBreak()
 {
@@ -39,7 +40,7 @@ void InputBreak()
 
 int UpdateMap(Master *mainStruct, char *mapText[MAX_HEIGHT][MAX_WIDTH])
 {
-
+	
 }
 int DrawMap(char *map[MAX_HEIGHT][MAX_WIDTH])
 {

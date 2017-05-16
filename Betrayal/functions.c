@@ -101,7 +101,7 @@ RoomPtr RotateWalls(RoomPtr room, int value)
 }
 
 //Allocates memory for a Room and gives value to its atributes.
-RoomPtr CreateRoom(string roomName, EventPtr roomEvent, OmenPtr roomOmen, WallType upType, WallType leftType, WallType downType, WallType rightType)
+RoomPtr CreateRoom(stringPtr roomName, EventPtr roomEvent, OmenPtr roomOmen, WallType upType, WallType leftType, WallType downType, WallType rightType)
 {
 	RoomPtr aux = (RoomPtr)malloc(sizeof(Room));
 
@@ -111,7 +111,8 @@ RoomPtr CreateRoom(string roomName, EventPtr roomEvent, OmenPtr roomOmen, WallTy
 		aux->position.y = 0;
 		aux->position.z = 0;
 		aux->positionLenght = 0;
-		aux->name = roomName;
+		strcpy(aux->name, roomName);
+		//aux->name = roomName;
 		aux->event = roomEvent;
 		aux->omen = roomOmen;
 		aux->next = NULL;
@@ -125,7 +126,9 @@ RoomPtr InstanciateRoom(RoomPtr room, Vector3 position)
 {
 	RoomPtr aux = (RoomPtr)malloc(sizeof(Room));
 	aux->event = room->event;
-	aux->name = room->name;
+	
+	strcpy(aux->name, room->name);
+	//aux->name = room->name;
 	aux->omen = room->omen;
 	aux->position = position;
 	aux->positionLenght = aux->position.x + aux->position.y;
@@ -286,14 +289,15 @@ boolean IniticializeMap(MapPtr map)
 
 #pragma region Cards
 //Allocates memory for a Character and gives value to its atributes.
-CharacterPtr CreateChar(string name, int might, int speed, int sanity, int inteligence)
+CharacterPtr CreateChar(stringPtr name, int might, int speed, int sanity, int inteligence)
 {
 	CharacterPtr aux = (CharacterPtr)malloc(sizeof(Character));
 
 	aux->position.x = 0;
 	aux->position.y = 0;
 	aux->position.z = 0;
-	aux->name = ToUpper(name);
+	strcpy(aux->name, ToUpper(name));
+	//aux->name = ToUpper(name);
 	aux->might = might;
 	aux->speed = speed;
 	aux->sanity = sanity;
@@ -326,7 +330,7 @@ CharacterPtr AddCharToList(CharacterPtr head, CharacterPtr node)
 	return head;
 }
 //Removes a Character from a CharacterList.
-CharacterPtr RemoveCharFromList(CharacterPtr head, string name)
+CharacterPtr RemoveCharFromList(CharacterPtr head, stringPtr name)
 {
 	CharacterPtr aux = head;
 	CharacterPtr aux2 = aux;
@@ -348,12 +352,14 @@ CharacterPtr RemoveCharFromList(CharacterPtr head, string name)
 }
 
 //Allocates memory for an Event and gives value to its atributes.
-EventPtr CreateEvent(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod)
+EventPtr CreateEvent(stringPtr name, stringPtr description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod)
 {
 	EventPtr aux = (EventPtr)malloc(sizeof(Event));
 
-	aux->name = ToUpper(name);
-	aux->description = ToUpper(description);
+	strcpy(aux->name, name);
+	//aux->name = ToUpper(name);
+	strcpy(aux->description, description);
+	//aux->description = ToUpper(description);
 	aux->might_mod = might_mod;
 	aux->speed_mod = speed_mod;
 	aux->sanity_mod = sanity_mod;
@@ -382,7 +388,7 @@ EventPtr AddEventToList(EventPtr head, EventPtr node)
 	return head;
 }
 //Removes an Event from an EventList.
-EventPtr RemoveEventFromList(EventPtr head, string name)
+EventPtr RemoveEventFromList(EventPtr head, stringPtr name)
 {
 	EventPtr aux = head;
 	EventPtr aux2 = aux;
@@ -404,12 +410,14 @@ EventPtr RemoveEventFromList(EventPtr head, string name)
 }
 
 //Allocates memory for an Omen and gives value to its atributes.
-OmenPtr CreateOmen(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod)
+OmenPtr CreateOmen(stringPtr name, stringPtr description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod)
 {
 	OmenPtr aux = (OmenPtr)malloc(sizeof(Omen));
 
-	aux->name = ToUpper(name);
-	aux->description = ToUpper(description);
+	strcpy(aux->name, name);
+	//aux->name = ToUpper(name);
+	strcpy(aux->description, description);
+	//aux->description = ToUpper(description);
 	aux->might_mod = might_mod;
 	aux->speed_mod = speed_mod;
 	aux->sanity_mod = sanity_mod;
@@ -438,7 +446,7 @@ OmenPtr AddOmenToList(OmenPtr head, OmenPtr node)
 	return head;
 }
 //Removes an Omen from an OmenList.
-OmenPtr RemoveOmenFromList(OmenPtr head, string name)
+OmenPtr RemoveOmenFromList(OmenPtr head, stringPtr name)
 {
 	OmenPtr aux = head;
 	OmenPtr aux2 = aux;
@@ -460,12 +468,14 @@ OmenPtr RemoveOmenFromList(OmenPtr head, string name)
 }
 
 //Allocates memory for an Item and gives value to its atributes.
-ItemPtr CreateItem(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod)
+ItemPtr CreateItem(stringPtr name, stringPtr description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod)
 {
 	ItemPtr aux = (ItemPtr)malloc(sizeof(Item));
 
-	aux->name = ToUpper(name);
-	aux->description = ToUpper(description);
+	strcpy(aux->name, name);
+	//aux->name = ToUpper(name);
+	strcpy(aux->description, description);
+	//aux->description = ToUpper(description);
 	aux->might_mod = might_mod;
 	aux->speed_mod = speed_mod;
 	aux->sanity_mod = sanity_mod;
@@ -494,7 +504,7 @@ ItemPtr AddItemToList(ItemPtr head, OmenPtr node)
 	return head;
 }
 //Removes an Item from an ItemList.
-ItemPtr RemoveItemFromList(ItemPtr head, string name)
+ItemPtr RemoveItemFromList(ItemPtr head, stringPtr name)
 {
 	ItemPtr aux = head;
 	ItemPtr aux2 = aux;
@@ -792,9 +802,24 @@ void AddCards(CardPtr c)
 	AddItemCards(c->itemList);
 
 	printf("CARDS SAVED...");
-
 }
 
+boolean WriteCards(CardPtr c)
+{
+	FILE *f = fopen("cards.bin", "w");
+	if (f)
+	{
+		CharacterPtr auxC = c->characterList;	
+		while (auxC)
+		{
+			fwrite(auxC, sizeof(Character), 1, f);
+			auxC = auxC->next;
+		}
+		fprintf(f, "ENDCHAR\n");
+		return TRUE;
+	}
+	return FALSE;
+}
 //Reads from the "cards.bin" file all the cards that compose the game.
 boolean LoadCards(CardPtr c)
 {

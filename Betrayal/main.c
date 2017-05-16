@@ -13,6 +13,7 @@ Date Log:
 */
 
 #include "estructs.h"
+#include <string.h>
 
 int main(void)
 {
@@ -20,7 +21,10 @@ int main(void)
 	Master GameMaster;
 	char DrawingTable[MAX_HEIGHT][MAX_WIDTH];
 
-	LoadMaster(&GameMaster);
+	//LoadMaster(&GameMaster);
+
+	CharacterPtr a = CreateChar("hello", 4, 4, 4, 4);
+	GameMaster.Cards.characterList[0] = *a;
 
 	int aux = Menu();
 	CardPtr database = CreateDatabase();
