@@ -1,6 +1,4 @@
 #include "estructs.h"
-#include <string.h>
-#include <ctype.h>
 #include <conio.h>
 
 
@@ -12,23 +10,13 @@ stringPtr InitString(stringPtr string)
 	}
 	return string;
 }
-stringPtr ToUpper(string string)
-{
-	for (int i = 0; string[i] != '\0'; i++)
-	{
-		string[0] = toupper(aux);
-		//strchr(string[i], (int)toupper(string[i]));
-	}
-	return string;
-}
 stringPtr ReadInput()
 {
-	char input[MAX_STRING];
-	InitString(input);
+	string input;
+	InitString(&input);
 	printf("Input: ");
 	gets(input);
-	ToUpper(input);
-
+	strupr(input);
 	return (stringPtr)input;
 }
 void InputBreak()

@@ -24,6 +24,7 @@ Date Log:
 */
 
 #include <stdio.h>
+#include <string.h>
 #define MAX_CARDS 136
 #define MAX_OMENS 13
 #define MAX_ITEMS 22
@@ -46,7 +47,7 @@ typedef struct Omen Omen, *OmenPtr;
 typedef struct Item Item, *ItemPtr;
 typedef struct Event Event, *EventPtr;
 typedef struct Character Character, *CharacterPtr;
-typedef struct Card Card, *CardPtr;
+typedef union Card Card, *CardPtr;
 
 #endif // !SIGNATURES
 
@@ -97,14 +98,14 @@ typedef struct vector3 Vector3, *Vector3Ptr;
 #ifndef DIRECTION
 #define DIRECTION
 
-typedef enum direction { Up, Right, Down, Left, Above, Bellow } Direction;
+typedef enum direction { UP, RIGHT, DOWN, LEFT, ABOVE, BELLOW } Direction;
 
 #endif // !DIRECTION
 
 #ifndef WALLTYPE
 #define WALLTYPE
 
-typedef enum wallType { Empty, Door, Window } WallType;
+typedef enum wallType { EMPTY, DOOR, WINDOW } WallType;
 
 #endif // !WALLTYPE
 
@@ -224,12 +225,12 @@ struct Event
 struct Character
 {
 	Vector3 position;
+	RoomPtr room;
 	string name;
 	int might, speed, sanity, inteligence;
 	MinionPtr minions;
 	ItemPtr items;
 	HistoryPtr history;
-	RoomPtr room;
 	struct Character *next;
 };
 
@@ -238,7 +239,7 @@ struct Character
 #ifndef CARDS
 #define CARDS
 
-struct Card
+union Card
 {
 	Item itemList[MAX_ITEMS];
 	Omen omenList[MAX_OMENS];
@@ -256,8 +257,9 @@ struct Master
 {
 	int damageTrack;
 	CharacterPtr characterList;
+	MinionPtr minionList;
 	Map map;
-	Card Cards;
+	Card cards;
 };
 
 typedef struct Master Master, *MasterPtr;
@@ -269,7 +271,10 @@ typedef struct Master Master, *MasterPtr;
 
 #pragma region CONSTRUCTORS
 
-CardPtr CreateDatabase(void);
+HistoryPtr CreateHistory(stringPtr text);
+HistoryPtr AddHistoryToList(HistoryPtr head, HistoryPtr node);
+HistoryPtr RemoveHistoryFromList(HistoryPtr head, HistoryPtr node);
+HistoryPtr DestroyHistory(HistoryPtr room);
 
 boolean AssignWalls(RoomWallPtr arr, WallType upType, WallType leftType, WallType downType, WallType rightType);
 RoomWallPtr FindWallDirection(RoomPtr room, Direction direction);
@@ -280,29 +285,36 @@ RoomPtr CreateRoom(stringPtr roomName, EventPtr roomEvent, OmenPtr roomOmen, Wal
 RoomPtr InstanciateRoom(RoomPtr room, Vector3 position);
 RoomPtr AddRoomToList(RoomPtr head, RoomPtr node);
 RoomPtr RemoveRoomFromList(RoomPtr head, stringPtr name);
+RoomPtr DestroyRoom(RoomPtr room);
 boolean OpenRoom(FloorPtr floor, RoomPtr currentRoom, Direction direction);
 
 FloorPtr CreateFloor(FloorLevel level);
 FloorPtr AddFloorToList(FloorPtr head, FloorPtr node);
 FloorPtr RemoveFloorFromList(FloorPtr head, FloorLevel level);
+FloorPtr DestroyFloor(FloorPtr floor);
 
 MapPtr CreateMap();
-
-CharacterPtr CreateChar(stringPtr name, int might, int speed, int sanity, int inteligence);
-CharacterPtr AddCharToList(CharacterPtr head, CharacterPtr node);
-CharacterPtr RemoveCharFromList(CharacterPtr head, stringPtr name);
+boolean IniticializeMap(MapPtr map);
 
 EventPtr CreateEvent(stringPtr name, stringPtr description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
 EventPtr AddEventToList(EventPtr head, EventPtr node);
 EventPtr RemoveEventFromList(EventPtr head, stringPtr name);
+EventPtr DestroyEvent(EventPtr node);
 
 OmenPtr CreateOmen(stringPtr name, stringPtr description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
 OmenPtr AddOmenToList(OmenPtr head, OmenPtr node);
 OmenPtr RemoveOmenFromList(OmenPtr head, stringPtr name);
+OmenPtr DestroyOmen(OmenPtr node);
 
 ItemPtr CreateItem(stringPtr name, stringPtr description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
 ItemPtr AddItemToList(ItemPtr head, OmenPtr node);
 ItemPtr RemoveItemFromList(ItemPtr head, stringPtr name);
+ItemPtr DestroyItem(ItemPtr node);
+
+CharacterPtr CreateChar(stringPtr name, int might, int speed, int sanity, int inteligence);
+CharacterPtr AddCharToList(CharacterPtr head, CharacterPtr node);
+CharacterPtr RemoveCharFromList(CharacterPtr head, stringPtr name);
+boolean DestroyChar(CharacterPtr node);
 #pragma endregion
 
 #pragma region ROLLS / STATS
@@ -323,15 +335,14 @@ boolean UnassignItem(CharacterPtr player, ItemPtr item);
 #pragma region DATABASE
 
 void AddCards(CardPtr c);
+boolean WriteCards(CardPtr c);
 boolean LoadCards(CardPtr c);
-MasterPtr LoadMaster(MasterPtr master);
+boolean LoadMaster(MasterPtr master);
 
 #pragma endregion
 
 #pragma region UI
-
 stringPtr InitString(stringPtr string);
-stringPtr ToUpper(stringPtr string);
 stringPtr ReadInput();
 void InputBreak();
 int Menu();

@@ -13,7 +13,6 @@ Date Log:
 */
 
 #include "estructs.h"
-#include <string.h>
 
 int main(void)
 {
@@ -21,14 +20,18 @@ int main(void)
 	Master GameMaster;
 	char DrawingTable[MAX_HEIGHT][MAX_WIDTH];
 
-	//LoadMaster(&GameMaster);
+	string xx = "hello";
+	RoomPtr x = CreateRoom(&xx, NULL, NULL, EMPTY, EMPTY, EMPTY, EMPTY);
+	FloorPtr xxx = CreateFloor(BASEMENT);
+	xxx->roomList = AddRoomToList(xxx->roomList, x);
 
-	CharacterPtr a = CreateChar("hello", 4, 4, 4, 4);
-	GameMaster.Cards.characterList[0] = *a;
+	xxx = DestroyFloor(xxx);
+
+	boolean start = LoadMaster(&GameMaster);
 
 	int aux = Menu();
-	CardPtr database = CreateDatabase();
-	//AddCards(*database);
+	
+	boolean exit = WriteCards(&(GameMaster.cards));
 
 	return 0;
 }
