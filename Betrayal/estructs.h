@@ -25,14 +25,13 @@ Date Log:
 
 #include <stdio.h>
 #include <string.h>
-#define MAX_CARDS 136
+#define MAX_CARDS 6
 #define MAX_OMENS 13
 #define MAX_ITEMS 22
 #define MAX_EVENTS 45
+#define MAX_MINIONS 3
 #define MAX_CHARACTERS 12
-#define MAX_ROOMS_X 10
-#define MAX_ROOMS_Y 10
-#define MAX_ROOMS_Z 3
+#define MAX_ROOMS 45
 #define MAX_WIDTH 120
 #define MAX_HEIGHT 30
 #define WALL_NUMBER 4
@@ -47,14 +46,14 @@ typedef struct Omen Omen, *OmenPtr;
 typedef struct Item Item, *ItemPtr;
 typedef struct Event Event, *EventPtr;
 typedef struct Character Character, *CharacterPtr;
-typedef union Card Card, *CardPtr;
+typedef struct Card Card, *CardPtr;
 
 #endif // !SIGNATURES
 
 #ifndef STRING
 #define STRING
 
-typedef char string[MAX_STRING], *stringPtr;
+typedef char string[MAX_STRING], **stringPtr;
 
 #endif // ! STRING
 
@@ -81,14 +80,13 @@ typedef struct History History, *HistoryPtr;
 #ifndef POSITION
 #define POSITION
 
-struct vector3
+struct vector2
 {
 	int x;
 	int y;
-	int z;
 };
 
-typedef struct vector3 Vector3, *Vector3Ptr;
+typedef struct vector2 Vector2, *Vector2Ptr;
 #endif // !POSITION
 
 //-----------------------------------END-GENERALS-------------------------------------//
@@ -127,7 +125,7 @@ typedef struct roomWall RoomWall, *RoomWallPtr;
 
 struct room
 {
-	Vector3 position;
+	Vector2 position;
 	int positionLenght;
 	string name;
 	RoomWall wall[WALL_NUMBER];
@@ -224,7 +222,7 @@ struct Event
 
 struct Character
 {
-	Vector3 position;
+	Vector2 position;
 	RoomPtr room;
 	string name;
 	int might, speed, sanity, inteligence;
@@ -239,13 +237,22 @@ struct Character
 #ifndef CARDS
 #define CARDS
 
-union Card
+struct Card
 {
 	Item itemList[MAX_ITEMS];
+	unsigned int itemCount;
 	Omen omenList[MAX_OMENS];
+	unsigned int omenCount;
 	Event eventList[MAX_EVENTS];
+	unsigned int eventCount;
 	Character characterList[MAX_CHARACTERS];
+	unsigned int charCount;
+	Minion minionList[MAX_MINIONS];
+	unsigned int minionCount;
+	Room roomList[MAX_ROOMS];
+	unsigned int roomCount;
 };
+
 
 #endif // !CARDS
 //-----------------------------END-GAME-ITEMS----------------------------------//
@@ -255,9 +262,8 @@ union Card
 
 struct Master
 {
-	int damageTrack;
+	int omenTrack;
 	CharacterPtr characterList;
-	MinionPtr minionList;
 	Map map;
 	Card cards;
 };
@@ -271,6 +277,9 @@ typedef struct Master Master, *MasterPtr;
 
 #pragma region CONSTRUCTORS
 
+Vector2Ptr CreateVector2(int x, int y);
+Vector2Ptr DestroyVector2(Vector2Ptr node);
+
 HistoryPtr CreateHistory(stringPtr text);
 HistoryPtr AddHistoryToList(HistoryPtr head, HistoryPtr node);
 HistoryPtr RemoveHistoryFromList(HistoryPtr head, HistoryPtr node);
@@ -282,7 +291,7 @@ boolean CopyWalls(RoomWallPtr thisRoomWalls, RoomWallPtr otherRoomWalls);
 RoomPtr RotateWalls(RoomPtr room, int value);
 
 RoomPtr CreateRoom(stringPtr roomName, EventPtr roomEvent, OmenPtr roomOmen, WallType upType, WallType leftType, WallType downType, WallType rightType);
-RoomPtr InstanciateRoom(RoomPtr room, Vector3 position);
+RoomPtr InstanciateRoom(RoomPtr room, Vector2 position);
 RoomPtr AddRoomToList(RoomPtr head, RoomPtr node);
 RoomPtr RemoveRoomFromList(RoomPtr head, stringPtr name);
 RoomPtr DestroyRoom(RoomPtr room);
@@ -294,7 +303,6 @@ FloorPtr RemoveFloorFromList(FloorPtr head, FloorLevel level);
 FloorPtr DestroyFloor(FloorPtr floor);
 
 MapPtr CreateMap();
-boolean IniticializeMap(MapPtr map);
 
 EventPtr CreateEvent(stringPtr name, stringPtr description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
 EventPtr AddEventToList(EventPtr head, EventPtr node);
@@ -307,14 +315,14 @@ OmenPtr RemoveOmenFromList(OmenPtr head, stringPtr name);
 OmenPtr DestroyOmen(OmenPtr node);
 
 ItemPtr CreateItem(stringPtr name, stringPtr description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
-ItemPtr AddItemToList(ItemPtr head, OmenPtr node);
+ItemPtr AddItemToList(ItemPtr head, ItemPtr node);
 ItemPtr RemoveItemFromList(ItemPtr head, stringPtr name);
 ItemPtr DestroyItem(ItemPtr node);
 
 CharacterPtr CreateChar(stringPtr name, int might, int speed, int sanity, int inteligence);
 CharacterPtr AddCharToList(CharacterPtr head, CharacterPtr node);
 CharacterPtr RemoveCharFromList(CharacterPtr head, stringPtr name);
-boolean DestroyChar(CharacterPtr node);
+CharacterPtr DestroyChar(CharacterPtr node);
 #pragma endregion
 
 #pragma region ROLLS / STATS
@@ -334,9 +342,8 @@ boolean UnassignItem(CharacterPtr player, ItemPtr item);
 
 #pragma region DATABASE
 
+void Reset(MasterPtr master);
 void AddCards(CardPtr c);
-boolean WriteCards(CardPtr c);
-boolean LoadCards(CardPtr c);
 boolean LoadMaster(MasterPtr master);
 
 #pragma endregion
@@ -345,7 +352,10 @@ boolean LoadMaster(MasterPtr master);
 stringPtr InitString(stringPtr string);
 stringPtr ReadInput();
 void InputBreak();
-int Menu();
+boolean InsertLineInDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH], Vector2Ptr position, stringPtr text);
+void CleanDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH]);
+int DrawMap(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH]);
+void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH]);
 
 #pragma endregion
 

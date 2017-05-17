@@ -23,12 +23,40 @@ Date Log:
 
 #include "estructs.h"
 
+//Allocates memory for a Vector2 and gives value to its atributes.
+Vector2Ptr CreateVector2(int x, int y)
+{
+	Vector2Ptr aux = (Vector2Ptr)malloc(sizeof(Vector2));
+	aux->x = x;
+	aux->y = y;
+	return aux;
+}
+//Destroy Vector2 from memory.
+Vector2Ptr DestroyVector2(Vector2Ptr node)
+{
+	free(node);
+	return NULL;
+}
+
+//Initializes an empty String.
+stringPtr InitString(stringPtr string)
+{
+	for (int i = 0; i < MAX_STRING; i++)
+	{
+		string[i] = 0;
+	}
+	return string;
+}
+
 //Allocates memory for a History and gives value to its atributes.
 HistoryPtr CreateHistory(stringPtr text)
 {
 	HistoryPtr aux = (HistoryPtr)malloc(sizeof(History));
 	aux->next = NULL;
-	strcpy(aux->turn, text);
+	if (text != NULL)
+		strcpy(aux->turn, strupr(text));
+	else
+		strcpy(aux->turn, "NULL");
 	return aux;
 }
 //Adds a History to a HistoryList.
@@ -74,9 +102,22 @@ HistoryPtr RemoveHistoryFromList(HistoryPtr head, HistoryPtr node)
 	return head;
 }
 //Destroy History from memory.
-HistoryPtr DestroyHistory(HistoryPtr room)
+HistoryPtr DestroyHistory(HistoryPtr node)
 {
-	free(room);
+	free(node);
+	return NULL;
+}
+//Destroy HistoryList from memory.
+HistoryPtr DestroyHistoryList(HistoryPtr head)
+{
+	HistoryPtr aux = head;
+	HistoryPtr aux2 = aux;
+	while (aux)
+	{
+		aux = aux->next;
+		aux2 = DestroyHistory(aux2);
+		aux2 = aux;
+	}
 	return NULL;
 }
 
@@ -158,9 +199,11 @@ RoomPtr CreateRoom(stringPtr roomName, EventPtr roomEvent, OmenPtr roomOmen, Wal
 	{
 		aux->position.x = 0;
 		aux->position.y = 0;
-		aux->position.z = 0;
 		aux->positionLenght = 0;
-		strcpy(aux->name, strupr(roomName));
+		if (roomName != NULL)
+			strcpy(aux->name, strupr(roomName));
+		else
+			strcpy(aux->name, "NULL");
 		aux->event = roomEvent;
 		aux->omen = roomOmen;
 		aux->next = NULL;
@@ -169,7 +212,7 @@ RoomPtr CreateRoom(stringPtr roomName, EventPtr roomEvent, OmenPtr roomOmen, Wal
 	return aux;
 }
 //Creates a copy of a room to use in a game.
-RoomPtr InstanciateRoom(RoomPtr room, Vector3 position)
+RoomPtr InstanciateRoom(RoomPtr room, Vector2 position)
 {
 	RoomPtr aux = (RoomPtr)malloc(sizeof(Room));
 	aux->event = room->event;
@@ -182,6 +225,7 @@ RoomPtr InstanciateRoom(RoomPtr room, Vector3 position)
 
 	if (i == TRUE)
 		return aux;
+	free(aux);
 	return NULL;
 }
 //Adds a Room to a RoomList.
@@ -204,6 +248,26 @@ RoomPtr AddRoomToList(RoomPtr head, RoomPtr node)
 		node->next = aux;
 	}
 	return head;
+}
+//Add a Room to the RoomArray.
+boolean AddRoomToArray(MasterPtr master, RoomPtr node)
+{
+	master->cards.roomList[master->cards.roomCount++] = *node;
+	return TRUE;
+}
+//Removes a Room from the RoomArray.
+boolean RemoveRoomFromArray(MasterPtr master, stringPtr node)
+{
+	RoomPtr aux = CreateRoom(NULL, NULL, NULL, EMPTY, EMPTY, EMPTY, EMPTY);
+	for(int i = 0; i > master->cards.roomCount; i++)
+		if (strcmp(master->cards.roomList[i].name, node) == 0)
+		{
+			for (int j = i; j > master->cards.roomCount - 1; i++)
+				master->cards.roomList[j] = master->cards.roomList[j + 1];
+			master->cards.roomList[master->cards.roomCount] = *aux;
+			return TRUE;
+		}
+	return FALSE;
 }
 //Removes a Room from a RoomList.
 RoomPtr RemoveRoomFromList(RoomPtr head, stringPtr name)
@@ -245,15 +309,24 @@ RoomPtr DestroyRoomList(RoomPtr head)
 	}
 	return NULL;
 }
+//Returns a random room from the roomList.
+RoomPtr RandomRoom(MasterPtr master)
+{
+	RoomPtr aux = NULL;
+	int random = rand() % master->cards.roomCount;
+	aux = &(master->cards.roomList[random]);
+	return aux;
+}
 //Opens a Room and generates one.
-boolean OpenRoom(FloorPtr floor, RoomPtr currentRoom, Direction direction)
+boolean OpenRoom(MasterPtr master, FloorPtr floor, RoomPtr currentRoom, Direction direction)
 {
 	RoomWallPtr aux = FindWallDirection(currentRoom, direction);
 	RoomPtr roomAux = NULL;
+	RoomPtr randomRoom = NULL;
 
 	if (aux->WallType == DOOR)
 	{
-		Vector3 addingValue = currentRoom->position;
+		Vector2 addingValue = currentRoom->position;
 		if (direction == UP)
 			addingValue.y++;
 		else if (direction == LEFT)
@@ -262,7 +335,11 @@ boolean OpenRoom(FloorPtr floor, RoomPtr currentRoom, Direction direction)
 			addingValue.y--;
 		else if (direction == RIGHT)
 			addingValue.x++;
-		//needs code here to generate a room.
+
+		randomRoom = RandomRoom(master);
+
+		roomAux = InstanciateRoom(randomRoom, addingValue);
+		floor->roomList = AddRoomToList(floor->roomList, roomAux);
 		return TRUE;
 	}
 	else
@@ -327,6 +404,19 @@ FloorPtr DestroyFloor(FloorPtr floor)
 	free(floor);
 	return NULL;
 }
+//Destroy FloorList from memory.
+FloorPtr DestroyFloorList(FloorPtr head)
+{
+	FloorPtr aux = head;
+	FloorPtr aux2 = aux;
+	while (aux)
+	{
+		aux = aux->next;
+		aux2 = DestroyFloor(aux2);
+		aux2 = aux;
+	}
+	return NULL;
+}
 #pragma endregion
 
 
@@ -337,25 +427,20 @@ MapPtr CreateMap()
 	FloorPtr basement = CreateFloor(BASEMENT);
 	FloorPtr ground = CreateFloor(GROUND);
 	FloorPtr upper = CreateFloor(UPPER);
+	aux->mapFloor = NULL;
+	aux->roomCounter = 0;
+
 
 	aux->mapFloor = AddFloorToList(aux->mapFloor, basement);
 	aux->mapFloor = AddFloorToList(aux->mapFloor, ground);
 	aux->mapFloor = AddFloorToList(aux->mapFloor, upper);
-	aux->roomCounter = 0;
 
 	return aux;
 }
-boolean IniticializeMap(MapPtr map)
+//Releases memory of a Map.
+boolean DestroyMap(MapPtr map)
 {
-	FloorPtr basement = CreateFloor(BASEMENT);
-	FloorPtr ground = CreateFloor(GROUND);
-	FloorPtr upper = CreateFloor(UPPER);
-
-	map->mapFloor = AddFloorToList(map->mapFloor, basement);
-	map->mapFloor = AddFloorToList(map->mapFloor, ground);
-	map->mapFloor = AddFloorToList(map->mapFloor, upper);
-	map->roomCounter = 0;
-
+	map->mapFloor = DestroyFloorList(map->mapFloor);
 	return TRUE;
 }
 
@@ -363,6 +448,10 @@ boolean IniticializeMap(MapPtr map)
 MinionPtr CreateMinion(stringPtr name, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod)
 {
 	MinionPtr aux = (MinionPtr)malloc(sizeof(Minion));
+	if (name != NULL)
+		strcpy(aux->name, strupr(name));
+	else
+		strcpy(aux->name, "NULL");
 	aux->might_mod = might_mod;
 	aux->speed_mod = speed_mod;
 	aux->sanity_mod = sanity_mod;
@@ -371,9 +460,9 @@ MinionPtr CreateMinion(stringPtr name, int might_mod, int speed_mod, int sanity_
 	return aux;
 }
 //Adds a Minion to a MinionList.
-MinionPtr DestroyMinion(MinionPtr room)
+MinionPtr DestroyMinion(MinionPtr node)
 {
-	free(room);
+	free(node);
 	return NULL;
 }
 //Assigns a Minion to a player and applies stat changes.
@@ -430,6 +519,27 @@ boolean UnassignMinion(CharacterPtr player, MinionPtr minion)
 			return FALSE;
 	}
 }
+//Add a Minion to the MinionArray.
+boolean AddMinionToArray(MasterPtr master, MinionPtr node)
+{
+	master->cards.minionList[master->cards.minionCount++] = *node;
+	return TRUE;
+}
+//Removes a Minion from the MinionArray.
+boolean RemoveMinionFromArray(MasterPtr master, stringPtr node)
+{
+	MinionPtr aux = CreateMinion(NULL, 0, 0, 0, 0);
+	for (int i = 0; i > master->cards.minionCount; i++)
+		if (strcmp(master->cards.minionList[i].name, node) == 0)
+		{
+			for (int j = i; j > master->cards.minionCount - 1; i++)
+				master->cards.minionList[j] = master->cards.minionList[j + 1];
+			master->cards.minionList[master->cards.minionCount] = *aux;
+			return TRUE;
+		}
+	return FALSE;
+}
+
 
 #pragma region Cards
 //Allocates memory for an Event and gives value to its atributes.
@@ -437,8 +547,14 @@ EventPtr CreateEvent(stringPtr name, stringPtr description, int might_mod, int s
 {
 	EventPtr aux = (EventPtr)malloc(sizeof(Event));
 
-	strcpy(aux->name, strupr(name));
-	strcpy(aux->description, strupr(description));
+	if (name != NULL)
+		strcpy(aux->name, strupr(name));
+	else
+		strcpy(aux->name, "NULL");
+	if (description != NULL)
+		strcpy(aux->description, strupr(description));
+	else
+		strcpy(aux->description, "NULL");
 	aux->might_mod = might_mod;
 	aux->speed_mod = speed_mod;
 	aux->sanity_mod = sanity_mod;
@@ -465,6 +581,26 @@ EventPtr AddEventToList(EventPtr head, EventPtr node)
 		node->next = aux;
 	}
 	return head;
+}
+//Add a Event to the EventArray.
+boolean AddEventToArray(MasterPtr master, EventPtr node)
+{
+	master->cards.eventList[master->cards.eventCount++] = *node;
+	return TRUE;
+}
+//Removes a Event from the EventArray.
+boolean RemoveEventFromArray(MasterPtr master, stringPtr node)
+{
+	EventPtr aux = CreateEvent(NULL, NULL, 0, 0, 0, 0);
+	for (int i = 0; i > master->cards.eventCount; i++)
+		if (strcmp(master->cards.eventList[i].name, node) == 0)
+		{
+			for (int j = i; j > master->cards.eventCount - 1; i++)
+				master->cards.eventList[j] = master->cards.eventList[j + 1];
+			master->cards.eventList[master->cards.eventCount] = *aux;
+			return TRUE;
+		}
+	return FALSE;
 }
 //Removes an Event from an EventList.
 EventPtr RemoveEventFromList(EventPtr head, stringPtr name)
@@ -493,14 +629,33 @@ EventPtr DestroyEvent(EventPtr node)
 	free(node);
 	return NULL;
 }
+//Destroy EventList from memory.
+EventPtr DestroyEventList(EventPtr head)
+{
+	EventPtr aux = head;
+	EventPtr aux2 = aux;
+	while (aux)
+	{
+		aux = aux->next;
+		aux2 = DestroyEvent(aux2);
+		aux2 = aux;
+	}
+	return NULL;
+}
 
 //Allocates memory for an Omen and gives value to its atributes.
 OmenPtr CreateOmen(stringPtr name, stringPtr description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod)
 {
 	OmenPtr aux = (OmenPtr)malloc(sizeof(Omen));
 
-	strcpy(aux->name, strupr(name));
-	strcpy(aux->description, strupr(description));
+	if (name != NULL)
+		strcpy(aux->name, strupr(name));
+	else
+		strcpy(aux->name, "NULL");
+	if (description != NULL)
+		strcpy(aux->description, strupr(description));
+	else
+		strcpy(aux->description, "NULL");
 	aux->might_mod = might_mod;
 	aux->speed_mod = speed_mod;
 	aux->sanity_mod = sanity_mod;
@@ -509,7 +664,7 @@ OmenPtr CreateOmen(stringPtr name, stringPtr description, int might_mod, int spe
 
 	return aux;
 }
- //Adds an Omen to an OmenList.
+//Adds an Omen to an OmenList.
 OmenPtr AddOmenToList(OmenPtr head, OmenPtr node)
 {
 	OmenPtr aux = head;
@@ -527,6 +682,26 @@ OmenPtr AddOmenToList(OmenPtr head, OmenPtr node)
 		node->next = aux;
 	}
 	return head;
+}
+//Add a Omen to the OmenArray.
+boolean AddOmenToArray(MasterPtr master, OmenPtr node)
+{
+	master->cards.omenList[master->cards.omenCount++] = *node;
+	return TRUE;
+}
+//Removes a Omen from the OmenArray.
+boolean RemoveOmentFromArray(MasterPtr master, stringPtr node)
+{
+	OmenPtr aux = CreateOmen(NULL, NULL, 0, 0, 0, 0);
+	for (int i = 0; i > master->cards.omenCount; i++)
+		if (strcmp(master->cards.omenList[i].name, node) == 0)
+		{
+			for (int j = i; j > master->cards.omenCount - 1; i++)
+				master->cards.omenList[j] = master->cards.omenList[j + 1];
+			master->cards.omenList[master->cards.omenCount] = *aux;
+			return TRUE;
+		}
+	return FALSE;
 }
 //Removes an Omen from an OmenList.
 OmenPtr RemoveOmenFromList(OmenPtr head, stringPtr name)
@@ -555,14 +730,33 @@ OmenPtr DestroyOmen(OmenPtr node)
 	free(node);
 	return NULL;
 }
+//Destroy OmenList from memory.
+OmenPtr DestroyOmenList(OmenPtr head)
+{
+	OmenPtr aux = head;
+	OmenPtr aux2 = aux;
+	while (aux)
+	{
+		aux = aux->next;
+		aux2 = DestroyOmen(aux2);
+		aux2 = aux;
+	}
+	return NULL;
+}
 
 //Allocates memory for an Item and gives value to its atributes.
 ItemPtr CreateItem(stringPtr name, stringPtr description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod)
 {
 	ItemPtr aux = (ItemPtr)malloc(sizeof(Item));
 
-	strcpy(aux->name, strupr(name));
-	strcpy(aux->description, strupr(description));
+	if (name != NULL)
+		strcpy(aux->name, strupr(name));
+	else
+		strcpy(aux->name, "NULL");
+	if (description != NULL)
+		strcpy(aux->description, strupr(description));
+	else
+		strcpy(aux->description, "NULL");
 	aux->might_mod = might_mod;
 	aux->speed_mod = speed_mod;
 	aux->sanity_mod = sanity_mod;
@@ -572,7 +766,7 @@ ItemPtr CreateItem(stringPtr name, stringPtr description, int might_mod, int spe
 	return aux;
 }
 //Adds an Item to an ItemList.
-ItemPtr AddItemToList(ItemPtr head, OmenPtr node)
+ItemPtr AddItemToList(ItemPtr head, ItemPtr node)
 {
 	ItemPtr aux = head;
 	ItemPtr aux2 = aux;
@@ -589,6 +783,26 @@ ItemPtr AddItemToList(ItemPtr head, OmenPtr node)
 		node->next = aux;
 	}
 	return head;
+}
+//Add a Item to the ItemArray.
+boolean AddItemToArray(MasterPtr master, ItemPtr node)
+{
+	master->cards.itemList[master->cards.itemCount++] = *node;
+	return TRUE;
+}
+//Removes a Item from the ItemArray.
+boolean RemoveItemFromArray(MasterPtr master, stringPtr node)
+{
+	ItemPtr aux = CreateItem(NULL, NULL, 0, 0, 0, 0);
+	for (int i = 0; i > master->cards.itemCount; i++)
+		if (strcmp(master->cards.itemList[i].name, node) == 0)
+		{
+			for (int j = i; j > master->cards.itemCount - 1; i++)
+				master->cards.itemList[j] = master->cards.itemList[j + 1];
+			master->cards.itemList[master->cards.itemCount] = *aux;
+			return TRUE;
+		}
+	return FALSE;
 }
 //Removes an Item from an ItemList.
 ItemPtr RemoveItemFromList(ItemPtr head, stringPtr name)
@@ -671,6 +885,19 @@ boolean UnassignItem(CharacterPtr player, ItemPtr item)
 			return FALSE;
 	}
 }
+//Destroy ItemList from memory.
+ItemPtr DestroyItemList(ItemPtr head)
+{
+	ItemPtr aux = head;
+	ItemPtr aux2 = aux;
+	while (aux)
+	{
+		aux = aux->next;
+		aux2 = DestroyItem(aux2);
+		aux2 = aux;
+	}
+	return NULL;
+}
 
 //Allocates memory for a Character and gives value to its atributes.
 CharacterPtr CreateChar(stringPtr name, int might, int speed, int sanity, int inteligence)
@@ -679,8 +906,10 @@ CharacterPtr CreateChar(stringPtr name, int might, int speed, int sanity, int in
 
 	aux->position.x = 0;
 	aux->position.y = 0;
-	aux->position.z = 0;
-	strcpy(aux->name, strupr(name));
+	if (name != NULL)
+		strcpy(aux->name, strupr(name));
+	else
+		strcpy(aux->name, "NULL");
 	aux->might = might;
 	aux->speed = speed;
 	aux->sanity = sanity;
@@ -712,6 +941,26 @@ CharacterPtr AddCharToList(CharacterPtr head, CharacterPtr node)
 	}
 	return head;
 }
+//Add a Character to the CharacterArray.
+boolean AddCharToArray(MasterPtr master, CharacterPtr node)
+{
+	master->cards.characterList[master->cards.charCount++] = *node;
+	return TRUE;
+}
+//Removes a Character from the CharacterArray.
+boolean RemovecharFromArray(MasterPtr master, stringPtr node)
+{
+	CharacterPtr aux = CreateChar(NULL, 0, 0, 0, 0);
+	for (int i = 0; i > master->cards.charCount; i++)
+		if (strcmp(master->cards.characterList[i].name, node) == 0)
+		{
+			for (int j = i; j > master->cards.charCount - 1; i++)
+				master->cards.characterList[j] = master->cards.characterList[j + 1];
+			master->cards.characterList[master->cards.charCount] = *aux;
+			return TRUE;
+		}
+	return FALSE;
+}
 //Removes a Character from a CharacterList.
 CharacterPtr RemoveCharFromList(CharacterPtr head, stringPtr name)
 {
@@ -734,7 +983,7 @@ CharacterPtr RemoveCharFromList(CharacterPtr head, stringPtr name)
 	return head;
 }
 //Destroys a Character from memory;
-boolean DestroyChar(CharacterPtr node)
+CharacterPtr DestroyChar(CharacterPtr node)
 {
 	HistoryPtr auxHis1 = node->history;
 	HistoryPtr auxHis2 = auxHis1;
@@ -766,6 +1015,19 @@ boolean DestroyChar(CharacterPtr node)
 	node->room = DestroyRoomList(node->room);
 
 	free(node);
+	return NULL;
+}
+//Destroy CharList from memory.
+CharacterPtr DestroyCharList(CharacterPtr head)
+{
+	CharacterPtr aux = head;
+	CharacterPtr aux2 = aux;
+	while (aux)
+	{
+		aux = aux->next;
+		aux2 = DestroyChar(aux2);
+		aux2 = aux;
+	}
 	return NULL;
 }
 #pragma endregion
@@ -937,6 +1199,43 @@ void AddCards(CardPtr c)
 
 	printf("CARDS SAVED...");
 }
+void Reset(MasterPtr master)
+{
+	master->characterList = DestroyCharList(master->characterList);
+	CharacterPtr auxchar = CreateChar(NULL, 0, 0, 0, 0);
+	EventPtr auxevent = CreateEvent(NULL, NULL, 0, 0, 0, 0);
+	ItemPtr auxitem = CreateItem(NULL, NULL, 0, 0, 0, 0);
+	MinionPtr auxmin = CreateMinion(NULL, 0, 0, 0, 0);
+	OmenPtr auxomen = CreateOmen(NULL, NULL, 0, 0, 0, 0);
+	RoomPtr auxrooom = CreateRoom(NULL, NULL, NULL, EMPTY, EMPTY, EMPTY, EMPTY);
+
+	master->cards.charCount = 0;
+	master->cards.eventCount = 0;
+	master->cards.itemCount = 0;
+	master->cards.minionCount = 0;
+	master->cards.omenCount = 0;
+	master->cards.roomCount = 0;
+
+	for (int i = 0; i < MAX_CHARACTERS; i++)
+		master->cards.characterList[i] = *auxchar;
+	for (int i = 0; i < MAX_EVENTS; i++)
+		master->cards.eventList[i] = *auxevent;
+	for (int i = 0; i < MAX_ITEMS; i++)
+		master->cards.itemList[i] = *auxitem;
+	for (int i = 0; i < MAX_MINIONS; i++)
+		master->cards.minionList[i] = *auxmin;
+	for (int i = 0; i < MAX_OMENS; i++)
+		master->cards.omenList[i] = *auxomen;
+	for (int i = 0; i < MAX_ROOMS; i++)
+		master->cards.roomList[i] = *auxrooom;
+
+	auxchar = DestroyChar(auxchar);
+	auxevent = DestroyEvent(auxevent);
+	auxitem = DestroyItem(auxitem);
+	auxmin = DestroyMinion(auxmin);
+	auxomen = DestroyOmen(auxomen);
+	auxrooom = DestroyRoom(auxrooom);
+}
 #pragma endregion
 //Writes to the "cards.bin" file all the cards taht compose the game.
 boolean WriteCards(CardPtr c)
@@ -948,6 +1247,15 @@ boolean WriteCards(CardPtr c)
 		fwrite(c->eventList, sizeof(Event), MAX_EVENTS, f);
 		fwrite(c->omenList, sizeof(Omen), MAX_OMENS, f);
 		fwrite(c->itemList, sizeof(Item), MAX_ITEMS, f);
+		fwrite(c->minionList, sizeof(Minion), MAX_MINIONS, f);
+		fwrite(c->roomList, sizeof(Room), MAX_ROOMS, f);
+
+		fwrite(c->charCount, sizeof(int), 1, f);
+		fwrite(c->eventCount, sizeof(int), 1, f);
+		fwrite(c->omenCount, sizeof(int), 1, f);
+		fwrite(c->itemCount, sizeof(int), 1, f);
+		fwrite(c->minionCount, sizeof(int), 1, f);
+		fwrite(c->roomCount, sizeof(int), 1, f);
 		fclose(f);
 		return TRUE;
 	}
@@ -963,6 +1271,16 @@ boolean LoadCards(CardPtr c)
 		fread(c->eventList, sizeof(Event), MAX_EVENTS, f);
 		fread(c->omenList, sizeof(Omen), MAX_OMENS, f);
 		fread(c->itemList, sizeof(Item), MAX_ITEMS, f);
+		fread(c->minionList, sizeof(Minion), MAX_MINIONS, f);
+		fread(c->roomList, sizeof(Room), MAX_ROOMS, f);
+
+		fread(c->charCount, sizeof(int), 1, f);
+		fread(c->eventCount, sizeof(int), 1, f);
+		fread(c->omenCount, sizeof(int), 1, f);
+		fread(c->itemCount, sizeof(int), 1, f);
+		fread(c->minionCount, sizeof(int), 1, f);
+		fread(c->roomCount, sizeof(int), 1, f);
+
 		fclose(f);
 		return TRUE;
 	}
@@ -971,9 +1289,10 @@ boolean LoadCards(CardPtr c)
 //Loads the master item.
 boolean LoadMaster(MasterPtr master)
 {
-	master->damageTrack = 0;
+	master->omenTrack = 0;
+	master->characterList = NULL;
 	boolean cards = LoadCards(&(master->cards));
-	boolean map = IniticializeMap(&(master->map));
+	master->map = *CreateMap();
 
 	if (cards == TRUE)
 		return TRUE;
@@ -983,8 +1302,10 @@ boolean LoadMaster(MasterPtr master)
 boolean EndMaster(MasterPtr master)
 {
 	boolean cards = WriteCards(&(master->cards));
+	boolean map = DestroyMap(&(master->map));
+	//master->characterList = DestroyCharList(master->characterList);
 
-	if (cards == TRUE)
+	if (cards == TRUE && map == TRUE)
 		return TRUE;
 	return FALSE;
 }

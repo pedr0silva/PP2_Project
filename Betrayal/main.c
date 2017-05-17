@@ -20,18 +20,33 @@ int main(void)
 	Master GameMaster;
 	char DrawingTable[MAX_HEIGHT][MAX_WIDTH];
 
-	string xx = "hello";
-	RoomPtr x = CreateRoom(&xx, NULL, NULL, EMPTY, EMPTY, EMPTY, EMPTY);
-	FloorPtr xxx = CreateFloor(BASEMENT);
-	xxx->roomList = AddRoomToList(xxx->roomList, x);
+	/*boolean start = LoadMaster(&GameMaster);
+	if (start == FALSE)
+	{
+		printf("%s", "THERE HAS BEEN AN ERROR LOADING.\n");
+		InputBreak();
+	}*/
 
-	xxx = DestroyFloor(xxx);
+	InputBreak();
 
-	boolean start = LoadMaster(&GameMaster);
+	CleanDrawingTable(&DrawingTable);
 
-	int aux = Menu();
+	Vector2Ptr x = CreateVector2(10,10);
+	string z = "WATUP";
 	
-	boolean exit = WriteCards(&(GameMaster.cards));
+	//InsertLineInDrawingTable(&DrawingTable, x, &z);
+	DrawMap(&DrawingTable);
+
+	//Menu(&GameMaster, &DrawingTable);
+	
+	Reset(&GameMaster);
+
+	boolean exit = EndMaster(&GameMaster);
+	if (exit == FALSE)
+	{
+		printf("%s", "THERE HAS BEEN AN ERROR SAVING.\n");
+		InputBreak();
+	}
 
 	return 0;
 }

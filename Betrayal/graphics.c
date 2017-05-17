@@ -2,14 +2,6 @@
 #include <conio.h>
 
 
-stringPtr InitString(stringPtr string)
-{
-	for (int i = 0; i < MAX_STRING; i++)
-	{
-		string[i] = 0;
-	}
-	return string;
-}
 stringPtr ReadInput()
 {
 	string input;
@@ -22,26 +14,39 @@ stringPtr ReadInput()
 void InputBreak()
 {
 	printf("Press a key to continue.");
-	getchar();
+	getch();
 	system("cls");
 }
+boolean InsertLineInDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH], Vector2Ptr position, stringPtr text)
+{
 
-int UpdateMap(Master *mainStruct, char *mapText[MAX_HEIGHT][MAX_WIDTH])
+	if (position->x > MAX_WIDTH || position->y > MAX_HEIGHT || position->x < 0 || position->y < 0)
+		return FALSE;
+	strcpy((*drawingTable)[position->y][position->x], text);
+	return TRUE;
+}
+
+void CleanDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+{
+	for (int i = 0; i < MAX_HEIGHT; i++)
+		for (int j = 0; j < MAX_WIDTH; j++)
+			(*drawingTable)[i][j] = ' ';
+}
+int UpdateMap(Master *mainStruct, char *drawingTable[MAX_HEIGHT][MAX_WIDTH])
 {
 	
 }
-int DrawMap(char *map[MAX_HEIGHT][MAX_WIDTH])
+int DrawMap(char (*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
-	char aux;
 	for (int i = 0; i < MAX_HEIGHT; i++)
-		for (int j = 0; i < MAX_WIDTH; j++)
-			printf("%c", map[i][j]);
+		for (int j = 0; j < MAX_WIDTH; j++)
+			printf("%c", (*drawingTable)[i][j]);
 }
-int Menu()
+void Menu(MasterPtr master, char (*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	char* input = NULL;
 
-	printf("WELCOME TO BETRAYAL AT HOUSE ON THE HILL\n\n");
+ 	printf("WELCOME TO BETRAYAL AT HOUSE ON THE HILL\n\n");
 	InputBreak();
 
 	do
