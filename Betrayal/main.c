@@ -20,26 +20,15 @@ int main(void)
 	Master GameMaster;
 	char DrawingTable[MAX_HEIGHT][MAX_WIDTH];
 
-	/*boolean start = LoadMaster(&GameMaster);
+	boolean start = LoadMaster(&GameMaster);
 	if (start == FALSE)
 	{
 		printf("%s", "THERE HAS BEEN AN ERROR LOADING.\n");
 		InputBreak();
-	}*/
-
-	InputBreak();
-
+	}
 	CleanDrawingTable(&DrawingTable);
-
-	Vector2Ptr x = CreateVector2(10,10);
-	string z = "WATUP";
 	
-	//InsertLineInDrawingTable(&DrawingTable, x, &z);
-	DrawMap(&DrawingTable);
-
-	//Menu(&GameMaster, &DrawingTable);
-	
-	Reset(&GameMaster);
+	Menu(&GameMaster, &DrawingTable);
 
 	boolean exit = EndMaster(&GameMaster);
 	if (exit == FALSE)

@@ -23,8 +23,15 @@ Date Log:
 27/04/2017 - Minor Fixes
 */
 
+#ifndef BETRAYAL_STRUCTS
+#define BETRAYAL_STRUCTS
+
 #include <stdio.h>
 #include <string.h>
+
+#pragma region GENERAL
+
+#pragma region CONSTANTS
 #define MAX_CARDS 6
 #define MAX_OMENS 13
 #define MAX_ITEMS 22
@@ -33,13 +40,30 @@ Date Log:
 #define MAX_CHARACTERS 12
 #define MAX_ROOMS 45
 #define MAX_WIDTH 120
-#define MAX_HEIGHT 30
+#define MAX_HEIGHT 29
 #define WALL_NUMBER 4
 #define MAX_STRING 512
+#pragma endregion
 
-//------------------------------------GENERALS-------------------------------------//
-#ifndef STRUCTSSIGNATURES
-#define STRUCTSSIGNATURES
+#pragma region AUXILIARY STRUCTS
+typedef char string[MAX_STRING];
+
+typedef enum { FALSE, TRUE } boolean;
+
+struct history
+{
+	string turn;
+	struct History *next;
+};
+typedef struct history History, *HistoryPtr;
+
+struct vector2
+{
+	int x;
+	int y;
+};
+typedef struct vector2 Vector2, *Vector2Ptr;
+#pragma endregion
 
 typedef struct Minion Minion, *MinionPtr;
 typedef struct Omen Omen, *OmenPtr;
@@ -48,80 +72,20 @@ typedef struct Event Event, *EventPtr;
 typedef struct Character Character, *CharacterPtr;
 typedef struct Card Card, *CardPtr;
 
-#endif // !SIGNATURES
+#pragma endregion
 
-#ifndef STRING
-#define STRING
-
-typedef char string[MAX_STRING], **stringPtr;
-
-#endif // ! STRING
-
-#ifndef BOOLEAN
-#define BOOLEAN
-
-typedef enum { FALSE, TRUE } boolean;
-
-#endif // !BOOLEAN
-
-#ifndef HISTORY
-#define HISTORY
-
-struct History
-{
-	string turn;
-	struct History *next;
-};
-
-typedef struct History History, *HistoryPtr;
-
-#endif // !HISTORY
-
-#ifndef POSITION
-#define POSITION
-
-struct vector2
-{
-	int x;
-	int y;
-};
-
-typedef struct vector2 Vector2, *Vector2Ptr;
-#endif // !POSITION
-
-//-----------------------------------END-GENERALS-------------------------------------//
-
-//------------------------------------MAP-------------------------------------//
-
-#ifndef DIRECTION
-#define DIRECTION
+#pragma region MAP
 
 typedef enum direction { UP, RIGHT, DOWN, LEFT, ABOVE, BELLOW } Direction;
 
-#endif // !DIRECTION
-
-#ifndef WALLTYPE
-#define WALLTYPE
-
 typedef enum wallType { EMPTY, DOOR, WINDOW } WallType;
-
-#endif // !WALLTYPE
-
-#ifndef ROOMWALL
-#define ROOMWALL
 
 struct roomWall
 {
 	Direction Direction;
 	WallType WallType;
 };
-
 typedef struct roomWall RoomWall, *RoomWallPtr;
-
-#endif // !ROOMWALL
-
-#ifndef ROOM
-#define ROOM
 
 struct room
 {
@@ -133,13 +97,7 @@ struct room
 	OmenPtr omen;
 	struct Room *next;
 };
-
 typedef struct room Room, *RoomPtr;
-
-#endif // !ROOM
-
-#ifndef FLOOR
-#define FLOOR
 
 typedef enum { BASEMENT = -1, GROUND, UPPER } FloorLevel;
 
@@ -151,25 +109,16 @@ struct floor
 };
 typedef struct floor Floor, *FloorPtr;
 
-#endif // !FLOOR
-
-#ifndef MAP
-#define MAP
-
 struct Map
 {
 	int roomCounter;
 	FloorPtr mapFloor;
 };
-
 typedef struct Map Map, *MapPtr;
 
-#endif // !MAP
-//-----------------------------------END-MAP----------------------------------//
+#pragma endregion
 
-//------------------------------------GAME-ITEMS-------------------------------------//
-#ifndef MINION
-#define MINION
+#pragma region  GAME_ITEMS
 
 struct Minion
 {
@@ -178,48 +127,24 @@ struct Minion
 	//usamos a tag mod porque os minions nao teem stats eles proprios, mas modificam as stats do seu "mestre".
 	struct Minion *next;
 };
-
-#endif // !MINION
-
-#ifndef OMEN
-#define OMEN
-
 struct Omen
 {
 	string name, description;
 	int might_mod, speed_mod, sanity_mod, intellect_mod;
 	struct Omen *next;
 };
-
-#endif // !OMEN
-
-#ifndef ITEM
-#define ITEM
-
 struct Item
 {
 	string name, description;
 	int might_mod, speed_mod, sanity_mod, intellect_mod;
 	struct Item *next;
 };
-
-#endif // !ITEM
-
-#ifndef EVENT
-#define EVENT
-
 struct Event
 {
 	string name, description;
 	int might_mod, speed_mod, sanity_mod, intellect_mod;
 	struct Event *next;
 };
-
-#endif // !EVENT
-
-#ifndef CHARACTER
-#define CHARACTER
-
 struct Character
 {
 	Vector2 position;
@@ -231,12 +156,6 @@ struct Character
 	HistoryPtr history;
 	struct Character *next;
 };
-
-#endif // !CHARACTER
-
-#ifndef CARDS
-#define CARDS
-
 struct Card
 {
 	Item itemList[MAX_ITEMS];
@@ -253,12 +172,9 @@ struct Card
 	unsigned int roomCount;
 };
 
+#pragma endregion
 
-#endif // !CARDS
-//-----------------------------END-GAME-ITEMS----------------------------------//
-
-#ifndef MASTER
-#define MASTER
+#pragma region MASTER
 
 struct Master
 {
@@ -267,97 +183,114 @@ struct Master
 	Map map;
 	Card cards;
 };
-
 typedef struct Master Master, *MasterPtr;
 
-#endif // !MASTER
+#pragma endregion
 
-#ifndef SIGNATURES
-#define SIGNATURES
-
-#pragma region CONSTRUCTORS
+#pragma region FUNCTION_SIGNATURES
+	#pragma region CONSTRUCTORS
 
 Vector2Ptr CreateVector2(int x, int y);
+Vector2Ptr ChangeVector2(Vector2Ptr auxVec, int x, int y);
 Vector2Ptr DestroyVector2(Vector2Ptr node);
-
-HistoryPtr CreateHistory(stringPtr text);
+void InitString(string string);
+HistoryPtr CreateHistory(string text);
 HistoryPtr AddHistoryToList(HistoryPtr head, HistoryPtr node);
 HistoryPtr RemoveHistoryFromList(HistoryPtr head, HistoryPtr node);
 HistoryPtr DestroyHistory(HistoryPtr room);
+HistoryPtr DestroyHistoryList(HistoryPtr head);
 
-boolean AssignWalls(RoomWallPtr arr, WallType upType, WallType leftType, WallType downType, WallType rightType);
-RoomWallPtr FindWallDirection(RoomPtr room, Direction direction);
-boolean CopyWalls(RoomWallPtr thisRoomWalls, RoomWallPtr otherRoomWalls);
 RoomPtr RotateWalls(RoomPtr room, int value);
-
-RoomPtr CreateRoom(stringPtr roomName, EventPtr roomEvent, OmenPtr roomOmen, WallType upType, WallType leftType, WallType downType, WallType rightType);
+RoomPtr CreateRoom(string roomName, EventPtr roomEvent, OmenPtr roomOmen, WallType upType, WallType leftType, WallType downType, WallType rightType);
 RoomPtr InstanciateRoom(RoomPtr room, Vector2 position);
 RoomPtr AddRoomToList(RoomPtr head, RoomPtr node);
-RoomPtr RemoveRoomFromList(RoomPtr head, stringPtr name);
+boolean AddRoomToArray(MasterPtr master, RoomPtr node);
+boolean RemoveRoomFromArray(MasterPtr master, string node);
+RoomPtr RemoveRoomFromList(RoomPtr head, string name);
 RoomPtr DestroyRoom(RoomPtr room);
-boolean OpenRoom(FloorPtr floor, RoomPtr currentRoom, Direction direction);
+RoomPtr DestroyRoomList(RoomPtr head);
+RoomPtr RandomRoom(MasterPtr master);
+boolean OpenRoom(MasterPtr master, FloorPtr floor, RoomPtr currentRoom, Direction direction);
 
 FloorPtr CreateFloor(FloorLevel level);
 FloorPtr AddFloorToList(FloorPtr head, FloorPtr node);
 FloorPtr RemoveFloorFromList(FloorPtr head, FloorLevel level);
 FloorPtr DestroyFloor(FloorPtr floor);
+FloorPtr DestroyFloorList(FloorPtr head);
 
-MapPtr CreateMap();
-
-EventPtr CreateEvent(stringPtr name, stringPtr description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
-EventPtr AddEventToList(EventPtr head, EventPtr node);
-EventPtr RemoveEventFromList(EventPtr head, stringPtr name);
-EventPtr DestroyEvent(EventPtr node);
-
-OmenPtr CreateOmen(stringPtr name, stringPtr description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
-OmenPtr AddOmenToList(OmenPtr head, OmenPtr node);
-OmenPtr RemoveOmenFromList(OmenPtr head, stringPtr name);
-OmenPtr DestroyOmen(OmenPtr node);
-
-ItemPtr CreateItem(stringPtr name, stringPtr description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
-ItemPtr AddItemToList(ItemPtr head, ItemPtr node);
-ItemPtr RemoveItemFromList(ItemPtr head, stringPtr name);
-ItemPtr DestroyItem(ItemPtr node);
-
-CharacterPtr CreateChar(stringPtr name, int might, int speed, int sanity, int inteligence);
-CharacterPtr AddCharToList(CharacterPtr head, CharacterPtr node);
-CharacterPtr RemoveCharFromList(CharacterPtr head, stringPtr name);
-CharacterPtr DestroyChar(CharacterPtr node);
-#pragma endregion
-
-#pragma region ROLLS / STATS
-
-unsigned int DiceRoll(int stat);
-
-#pragma endregion
-
-#pragma region ITEM / MINION ASSIGNMENT
-
+MinionPtr CreateMinion(string name, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
+boolean AddMinionToArray(MasterPtr master, MinionPtr node);
+boolean RemoveMinionFromArray(MasterPtr master, string node);
+MinionPtr DestroyMinion(MinionPtr node);
 CharacterPtr AssignMinion(CharacterPtr player, MinionPtr minion);
 boolean UnassignMinion(CharacterPtr player, MinionPtr minion);
+
+EventPtr CreateEvent(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
+EventPtr AddEventToList(EventPtr head, EventPtr node);
+boolean AddEventToArray(MasterPtr master, EventPtr node);
+boolean RemoveEventFromArray(MasterPtr master, string node);
+EventPtr RemoveEventFromList(EventPtr head, string name);
+EventPtr DestroyEvent(EventPtr node);
+EventPtr DestroyEventList(EventPtr head);
+EventPtr RandomEvent(MasterPtr master);
+
+OmenPtr CreateOmen(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
+OmenPtr AddOmenToList(OmenPtr head, OmenPtr node);
+boolean AddOmenToArray(MasterPtr master, OmenPtr node);
+boolean RemoveOmentFromArray(MasterPtr master, string node);
+OmenPtr RemoveOmenFromList(OmenPtr head, string name);
+OmenPtr DestroyOmen(OmenPtr node);
+OmenPtr DestroyOmenList(OmenPtr head);
+OmenPtr RandomOmen(MasterPtr master);
+
+ItemPtr CreateItem(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
+ItemPtr AddItemToList(ItemPtr head, ItemPtr node);
+boolean AddItemToArray(MasterPtr master, ItemPtr node);
+boolean RemoveItemFromArray(MasterPtr master, string node);
+ItemPtr RemoveItemFromList(ItemPtr head, string name);
+ItemPtr DestroyItem(ItemPtr node);
+ItemPtr DestroyItemList(ItemPtr head);
+ItemPtr RandomItem(MasterPtr master);
 CharacterPtr AssignItem(CharacterPtr player, ItemPtr item);
 boolean UnassignItem(CharacterPtr player, ItemPtr item);
 
-#pragma endregion
+CharacterPtr CreateChar(string name, int might, int speed, int sanity, int inteligence);
+CharacterPtr AddCharToList(CharacterPtr head, CharacterPtr node);
+boolean AddCharToArray(MasterPtr master, CharacterPtr node);
+boolean RemovecharFromArray(MasterPtr master, string node);
+CharacterPtr RemoveCharFromList(CharacterPtr head, string name);
+CharacterPtr DestroyChar(CharacterPtr node);
+CharacterPtr DestroyCharList(CharacterPtr head);
+CharacterPtr RandomChar(MasterPtr master);
 
-#pragma region DATABASE
+	#pragma endregion
+
+	#pragma region ROLLS / STATS
+
+unsigned int DiceRoll(int stat);
+
+	#pragma endregion
+
+	#pragma region DATABASE
 
 void Reset(MasterPtr master);
 void AddCards(CardPtr c);
 boolean LoadMaster(MasterPtr master);
+boolean EndMaster(MasterPtr master);
 
-#pragma endregion
+	#pragma endregion
 
-#pragma region UI
-stringPtr InitString(stringPtr string);
-stringPtr ReadInput();
+	#pragma region UI
+
+void ReadInput(string input);
 void InputBreak();
-boolean InsertLineInDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH], Vector2Ptr position, stringPtr text);
-void CleanDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH]);
+boolean InsertLineInDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH], Vector2Ptr position, string text);
+boolean CleanDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH]);
 int DrawMap(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH]);
 void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH]);
 
+	#pragma endregion
+
 #pragma endregion
 
-
-#endif // !SIGNATURES
+#endif // !BETRAYAL_STRUCTS
