@@ -20,8 +20,8 @@ int main(void)
 	Master GameMaster;
 	char DrawingTable[MAX_HEIGHT][MAX_WIDTH];
 
-	boolean start = LoadMaster(&GameMaster);
-	if (start == FALSE)
+	_boolean start = LoadMaster(&GameMaster);
+	if (start == _FALSE)
 	{
 		printf("%s", "THERE HAS BEEN AN ERROR LOADING.\n");
 		InputBreak();
@@ -30,8 +30,8 @@ int main(void)
 	
 	Menu(&GameMaster, &DrawingTable);
 
-	boolean exit = EndMaster(&GameMaster);
-	if (exit == FALSE)
+	_boolean exit = EndMaster(&GameMaster);
+	if (exit == _FALSE)
 	{
 		printf("%s", "THERE HAS BEEN AN ERROR SAVING.\n");
 		InputBreak();

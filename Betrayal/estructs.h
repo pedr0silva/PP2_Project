@@ -28,6 +28,7 @@ Date Log:
 
 #include <stdio.h>
 #include <string.h>
+#include <Windows.h>
 
 #pragma region GENERAL
 
@@ -48,7 +49,7 @@ Date Log:
 #pragma region AUXILIARY STRUCTS
 typedef char string[MAX_STRING];
 
-typedef enum { FALSE, TRUE } boolean;
+typedef enum { _FALSE, _TRUE } _boolean;
 
 struct history
 {
@@ -204,13 +205,13 @@ RoomPtr RotateWalls(RoomPtr room, int value);
 RoomPtr CreateRoom(string roomName, EventPtr roomEvent, OmenPtr roomOmen, WallType upType, WallType leftType, WallType downType, WallType rightType);
 RoomPtr InstanciateRoom(RoomPtr room, Vector2 position);
 RoomPtr AddRoomToList(RoomPtr head, RoomPtr node);
-boolean AddRoomToArray(MasterPtr master, RoomPtr node);
-boolean RemoveRoomFromArray(MasterPtr master, string node);
+_boolean AddRoomToArray(MasterPtr master, RoomPtr node);
+_boolean RemoveRoomFromArray(MasterPtr master, string node);
 RoomPtr RemoveRoomFromList(RoomPtr head, string name);
 RoomPtr DestroyRoom(RoomPtr room);
 RoomPtr DestroyRoomList(RoomPtr head);
 RoomPtr RandomRoom(MasterPtr master);
-boolean OpenRoom(MasterPtr master, FloorPtr floor, RoomPtr currentRoom, Direction direction);
+_boolean OpenRoom(MasterPtr master, FloorPtr floor, RoomPtr currentRoom, Direction direction);
 
 FloorPtr CreateFloor(FloorLevel level);
 FloorPtr AddFloorToList(FloorPtr head, FloorPtr node);
@@ -219,16 +220,16 @@ FloorPtr DestroyFloor(FloorPtr floor);
 FloorPtr DestroyFloorList(FloorPtr head);
 
 MinionPtr CreateMinion(string name, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
-boolean AddMinionToArray(MasterPtr master, MinionPtr node);
-boolean RemoveMinionFromArray(MasterPtr master, string node);
+_boolean AddMinionToArray(MasterPtr master, MinionPtr node);
+_boolean RemoveMinionFromArray(MasterPtr master, string node);
 MinionPtr DestroyMinion(MinionPtr node);
 CharacterPtr AssignMinion(CharacterPtr player, MinionPtr minion);
-boolean UnassignMinion(CharacterPtr player, MinionPtr minion);
+_boolean UnassignMinion(CharacterPtr player, MinionPtr minion);
 
-EventPtr CreateEvent(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
+EventPtr Create_Event(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
 EventPtr AddEventToList(EventPtr head, EventPtr node);
-boolean AddEventToArray(MasterPtr master, EventPtr node);
-boolean RemoveEventFromArray(MasterPtr master, string node);
+_boolean AddEventToArray(MasterPtr master, EventPtr node);
+_boolean RemoveEventFromArray(MasterPtr master, string node);
 EventPtr RemoveEventFromList(EventPtr head, string name);
 EventPtr DestroyEvent(EventPtr node);
 EventPtr DestroyEventList(EventPtr head);
@@ -236,8 +237,8 @@ EventPtr RandomEvent(MasterPtr master);
 
 OmenPtr CreateOmen(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
 OmenPtr AddOmenToList(OmenPtr head, OmenPtr node);
-boolean AddOmenToArray(MasterPtr master, OmenPtr node);
-boolean RemoveOmentFromArray(MasterPtr master, string node);
+_boolean AddOmenToArray(MasterPtr master, OmenPtr node);
+_boolean RemoveOmentFromArray(MasterPtr master, string node);
 OmenPtr RemoveOmenFromList(OmenPtr head, string name);
 OmenPtr DestroyOmen(OmenPtr node);
 OmenPtr DestroyOmenList(OmenPtr head);
@@ -245,19 +246,19 @@ OmenPtr RandomOmen(MasterPtr master);
 
 ItemPtr CreateItem(string name, string description, int might_mod, int speed_mod, int sanity_mod, int inteligence_mod);
 ItemPtr AddItemToList(ItemPtr head, ItemPtr node);
-boolean AddItemToArray(MasterPtr master, ItemPtr node);
-boolean RemoveItemFromArray(MasterPtr master, string node);
+_boolean AddItemToArray(MasterPtr master, ItemPtr node);
+_boolean RemoveItemFromArray(MasterPtr master, string node);
 ItemPtr RemoveItemFromList(ItemPtr head, string name);
 ItemPtr DestroyItem(ItemPtr node);
 ItemPtr DestroyItemList(ItemPtr head);
 ItemPtr RandomItem(MasterPtr master);
 CharacterPtr AssignItem(CharacterPtr player, ItemPtr item);
-boolean UnassignItem(CharacterPtr player, ItemPtr item);
+_boolean UnassignItem(CharacterPtr player, ItemPtr item);
 
 CharacterPtr CreateChar(string name, int might, int speed, int sanity, int inteligence);
 CharacterPtr AddCharToList(CharacterPtr head, CharacterPtr node);
-boolean AddCharToArray(MasterPtr master, CharacterPtr node);
-boolean RemovecharFromArray(MasterPtr master, string node);
+_boolean AddCharToArray(MasterPtr master, CharacterPtr node);
+_boolean RemovecharFromArray(MasterPtr master, string node);
 CharacterPtr RemoveCharFromList(CharacterPtr head, string name);
 CharacterPtr DestroyChar(CharacterPtr node);
 CharacterPtr DestroyCharList(CharacterPtr head);
@@ -275,8 +276,8 @@ unsigned int DiceRoll(int stat);
 
 void Reset(MasterPtr master);
 void AddCards(CardPtr c);
-boolean LoadMaster(MasterPtr master);
-boolean EndMaster(MasterPtr master);
+_boolean LoadMaster(MasterPtr master);
+_boolean EndMaster(MasterPtr master);
 
 	#pragma endregion
 
@@ -284,8 +285,8 @@ boolean EndMaster(MasterPtr master);
 
 void ReadInput(string input);
 void InputBreak();
-boolean InsertLineInDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH], Vector2Ptr position, string text);
-boolean CleanDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH]);
+_boolean InsertLineInDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH], Vector2Ptr position, string text);
+_boolean CleanDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH]);
 int DrawMap(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH]);
 void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH]);
 
