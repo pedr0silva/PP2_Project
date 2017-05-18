@@ -16,22 +16,24 @@ Date Log:
 
 int main(void)
 {
+	ShowConsoleCursor(FALSE);
+
 	//Important variables.
 	Master GameMaster;
 	char DrawingTable[MAX_HEIGHT][MAX_WIDTH];
+	CleanDrawingTable(&DrawingTable);
 
-	_boolean start = LoadMaster(&GameMaster);
-	if (start == _FALSE)
+	BOOL start = LoadMaster(&GameMaster);
+	if (start == FALSE)
 	{
 		printf("%s", "THERE HAS BEEN AN ERROR LOADING.\n");
 		InputBreak();
 	}
-	CleanDrawingTable(&DrawingTable);
 	
 	Menu(&GameMaster, &DrawingTable);
 
-	_boolean exit = EndMaster(&GameMaster);
-	if (exit == _FALSE)
+	BOOL exit = EndMaster(&GameMaster);
+	if (exit == FALSE)
 	{
 		printf("%s", "THERE HAS BEEN AN ERROR SAVING.\n");
 		InputBreak();

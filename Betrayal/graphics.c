@@ -1,5 +1,5 @@
 #include "estructs.h"
-#include <conio.h>
+
 
 void ShowConsoleCursor(BOOL showFlag)
 {
@@ -9,24 +9,63 @@ void ShowConsoleCursor(BOOL showFlag)
 	cursorInfo.bVisible = showFlag; // set the cursor visibility
 	SetConsoleCursorInfo(out, &cursorInfo);
 }
-void ReadInput(string input)
+KEYBOARD ReadInput()
 {
-	printf("INPUT: ");
-	gets(input);
-	strupr(input);
+	KEYBOARD key = NONE;
+	char input;
+
+	input = getch();
+	switch (input)
+	{
+	case -32:
+	{
+		input = getch();
+		switch (input)
+		{
+		case UP_ARROW:
+			return UP_ARROW;
+		case DOWN_ARROW:
+			return DOWN_ARROW;
+		case LEFT_ARROW:
+			return LEFT_ARROW;
+		case RIGHT_ARROW:
+			return RIGHT_ARROW;
+		default:
+			return NONE;
+		}
+	}
+	case ESC:
+		return ESC;
+	case SPACE:
+		return SPACE;
+	case ENTER:
+		return ENTER;
+	default:
+		return NONE;
+	}
 }
 void InputBreak()
 {
-	printf("PRESS A KEY TO CONTINUE.");
 	getch();
 }
 
-_boolean InsertLineInDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH], Vector2Ptr position, string text)
+BOOL InsertSelectableText(string text, int x, int y, int currentSelected, int movingSelected, int movedX, int movedY, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+{
+	Vector2Ptr auxPos = CreateVector2(x, y);
+	BOOL auxBool = TRUE;
+	if (currentSelected == movingSelected)
+		auxBool = ChangeVector2(auxPos, movedX, movedY);
+	InsertLineInDrawingTable(*drawingTable, auxPos, text);
+
+	auxPos = DestroyVector2(auxPos);
+	return TRUE;
+}
+BOOL InsertLineInDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH], Vector2Ptr position, string text)
 {
 	Vector2 aux = *position;
 	int lenght = strlen(text);
 	if (position->x > MAX_WIDTH || position->y > MAX_HEIGHT || position->x < 0 || position->y < 0)
-		return _FALSE;
+		return FALSE;
 	for (int i = 0; i < lenght; i++)
 	{
 		(*drawingTable)[aux.y][aux.x++] = text[i];
@@ -37,9 +76,9 @@ _boolean InsertLineInDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH], Ve
 		}
 
 	}
-	return _TRUE;
+	return TRUE;
 }
-_boolean CleanDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+BOOL CleanDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	system("cls");
 	for (int i = 0; i < MAX_HEIGHT; i++)
@@ -53,11 +92,9 @@ int UpdateMap(Master *mainStruct, char *drawingTable[MAX_HEIGHT][MAX_WIDTH])
 }
 int DrawMap(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
-	ShowConsoleCursor(FALSE);
 	for (int i = 0; i < MAX_HEIGHT; i++)
 		for (int j = 0; j < MAX_WIDTH; j++)
-			printf("%c", (*drawingTable)[i][j]);
-	ShowConsoleCursor(TRUE);
+			cprintf("%c", (*drawingTable)[i][j]);
 }
 void DrawError(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
@@ -67,47 +104,90 @@ void DrawError(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
 }
 
-void Credits(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+void Reset_Menu(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
-	string inputStr;
+	KEYBOARD input = NONE;
+	unsigned int selected = 0;
 	string auxStr;
 	Vector2Ptr auxPos = CreateVector2(0, 0);
-	_boolean error = _FALSE;
-	InitString(inputStr);
 
 	do
 	{
 		CleanDrawingTable(*drawingTable);
 
+		strcpy(auxStr, "ARE YOU SURE YOU WANT TO RESET ALL DATA?");
+		ChangeVector2(auxPos, 35, 14);
+		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
+
+		strcpy(auxStr, "YES");
+		ChangeVector2(auxPos, 35, 16);
+		if (selected == 0)
+			ChangeVector2(auxPos, 38, 16);
+		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
+
+		strcpy(auxStr, "NO");
+		ChangeVector2(auxPos, 35, 18);
+		if (selected == 1)
+			ChangeVector2(auxPos, 38, 18);
+		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
+
+		DrawMap(*drawingTable);
+
+		input = ReadInput();
+
+		if (input == DOWN_ARROW && selected < 1)
+			selected++;
+		else if (input == UP_ARROW && selected > 0)
+			selected--;
+		else if (input == ENTER)
+		{
+			switch (selected)
+			{
+			case 0:
+				break;
+			default:
+				break;
+			}
+		}
+	} while (1);
+
+	CleanDrawingTable(*drawingTable);
+	DrawMap(*drawingTable);
+
+	auxPos = DestroyVector2(auxPos);
+}
+void Credits(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+{
+	KEYBOARD input = NONE;
+	string auxStr;
+	Vector2Ptr auxPos = CreateVector2(0, 0);
+
+	do
+	{
+		CleanDrawingTable(*drawingTable);
+
+
 		strcpy(auxStr, "CREATES BY:");
-		auxPos = ChangeVector2(auxPos, 35, 14);
+		ChangeVector2(auxPos, 35, 14);
 		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
 
 		strcpy(auxStr, "DIOGO PORTELA");
-		auxPos = ChangeVector2(auxPos, 40, 16);
+		ChangeVector2(auxPos, 35, 16);
 		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
 
 		strcpy(auxStr, "PEDRO SILVA");
-		auxPos = ChangeVector2(auxPos, 40, 18);
+		ChangeVector2(auxPos, 35, 18);
 		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
 
 		strcpy(auxStr, "BACK");
-		auxPos = ChangeVector2(auxPos, 35, 22);
+		ChangeVector2(auxPos, 40, 20);
 		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
 
-		if (error == _TRUE)
-		{
-			DrawError(drawingTable);
-			error = _FALSE;
-		}
-
 		DrawMap(*drawingTable);
-		ReadInput(inputStr);
 
-		if (strcmp(inputStr, "BACK") != 0)
-			error = _TRUE;
+		input = ReadInput();
 
-	} while ((strcmp(inputStr, "BACK") != 0));
+	} while (input != ENTER);
 
 	CleanDrawingTable(*drawingTable);
 	DrawMap(*drawingTable);
@@ -116,78 +196,67 @@ void Credits(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 }
 void Options(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
-	string inputStr;
-	InitString(inputStr);
-
-	string auxStr;
-	Vector2Ptr auxPos = CreateVector2(0, 0);
-	_boolean error = _FALSE;
+	KEYBOARD input = NONE;
+	unsigned int selected = 0;
 
 	do
 	{
 		CleanDrawingTable(*drawingTable);
 
-		strcpy(auxStr, "CHARACTERS");
-		auxPos = ChangeVector2(auxPos, 35, 8);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
-
-		strcpy(auxStr, "ROOMS");
-		auxPos = ChangeVector2(auxPos, 35, 10);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
-
-		strcpy(auxStr, "EVENTS");
-		auxPos = ChangeVector2(auxPos, 35, 12);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
-
-		strcpy(auxStr, "ITEMS");
-		auxPos = ChangeVector2(auxPos, 35, 14);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
-
-		strcpy(auxStr, "OMENS");
-		auxPos = ChangeVector2(auxPos, 35, 16);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
-
-		strcpy(auxStr, "MINIONS");
-		auxPos = ChangeVector2(auxPos, 35, 18);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
-
-		strcpy(auxStr, "RESET");
-		auxPos = ChangeVector2(auxPos, 35, 20);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
-
-		strcpy(auxStr, "BACK");
-		auxPos = ChangeVector2(auxPos, 35, 22);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
-
-		if (error == _TRUE)
-		{
-			DrawError(drawingTable);
-			error = _FALSE;
-		}
+		InsertSelectableText("CHARACTERS", 35, 8, selected, 0, 38, 8, drawingTable);
+		InsertSelectableText("EVENTS", 35, 10, selected, 1, 38, 10, drawingTable);
+		InsertSelectableText("ITEMS", 35, 12, selected, 2, 38, 12, drawingTable);
+		InsertSelectableText("MINIONS", 35, 14, selected, 3, 38, 14, drawingTable);
+		InsertSelectableText("OMENS", 35, 16, selected, 4, 38, 16, drawingTable);
+		InsertSelectableText("ROOMS", 35, 18, selected, 5, 38, 18, drawingTable);
+		InsertSelectableText("RESET", 35, 20, selected, 6, 38, 20, drawingTable);
+		InsertSelectableText("BACK", 35, 22, selected, 7, 38, 22, drawingTable);
 
 		DrawMap(*drawingTable);
-		ReadInput(inputStr);
 
-		if (strcmp(inputStr, "BACK") != 0)
-			error = _TRUE;
+		input = ReadInput();
 
-	} while ((strcmp(inputStr, "BACK") != 0));
+		if (input == DOWN_ARROW && selected < 7)
+			selected++;
+		else if (input == UP_ARROW && selected > 0)
+			selected--;
+		else if (input == ENTER)
+		{
+			switch (selected)
+			{
+			case 0:
+				break;
+			case 1:
+				break;
+			case 2:
+				break;
+			case 3:
+				break;
+			case 4:
+				break;
+			case 5:
+				break;
+			case 6:
+				break;
+			default:
+				break;
+			}
+		}
+
+	} while (!((input == ENTER) && (selected == 7)));
 
 	CleanDrawingTable(*drawingTable);
 	DrawMap(*drawingTable);
-
-	auxPos = DestroyVector2(auxPos);
 }
 void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
-	string inputStr;
-	string auxStr;
-	Vector2Ptr auxPos = CreateVector2(40, 14);
-	_boolean error = _FALSE;
-	InitString(inputStr);
+	KEYBOARD input = NONE;
+	unsigned int selected = 0;
+	Vector2 auxPos;
+	ChangeVector2(&auxPos, 40, 14);
 
-	strcpy(auxStr, "WELCOME TO BETRAYAL AT HOUSE ON THE HILL");
-	InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
+	InsertLineInDrawingTable(*drawingTable, &auxPos, "WELCOME TO BETRAYAL AT HOUSE ON THE HILL");
+
 	DrawMap(*drawingTable);
 
 	InputBreak();
@@ -195,46 +264,37 @@ void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	{
 		CleanDrawingTable(*drawingTable);
 
-		strcpy(auxStr, "NEW GAME");
-		auxPos = ChangeVector2(auxPos, 35, 14);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
-
-		strcpy(auxStr, "OPTIONS");
-		auxPos = ChangeVector2(auxPos, 35, 16);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
-
-		strcpy(auxStr, "CREDITS");
-		auxPos = ChangeVector2(auxPos, 35, 18);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
-
-		strcpy(auxStr, "EXIT");
-		auxPos = ChangeVector2(auxPos, 35, 20);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
-
-		if (error == _TRUE)
-		{
-			DrawError(drawingTable);
-			error = _FALSE;
-		}
+		InsertSelectableText("NEW GAME", 35, 14, selected, 0, 38, 14, drawingTable);
+		InsertSelectableText("OPTIONS", 35, 16, selected, 1, 38, 16, drawingTable);
+		InsertSelectableText("CREDITS", 35, 18, selected, 2, 38, 18, drawingTable);
+		InsertSelectableText("EXIT", 35, 20, selected, 3, 38, 20, drawingTable);
 
 		DrawMap(*drawingTable);
-		ReadInput(inputStr);
+		
+		input = ReadInput();
 
-		if (strcmp(inputStr, "NEW GAME") == 0)
-			break;
-		//Play(master, drawingTable);
-		else if (strcmp(inputStr, "CREDITS") == 0)
-			Credits(master, drawingTable);
-		else if (strcmp(inputStr, "OPTIONS") == 0)
-			Options(master, drawingTable);
-		else if (strcmp(inputStr, "EXIT") != 0)
-			error = _TRUE;
-
-	} while ((strcmp(inputStr, "EXIT") != 0));
+		if (input == DOWN_ARROW && selected < 3)
+			selected++;
+		else if (input == UP_ARROW && selected > 0)
+			selected--;
+		else if (input == ENTER)
+		{
+			switch (selected)
+			{
+			case 0:
+				break;
+			case 1:
+				Options(master, drawingTable);
+				break;
+			case 2:
+				Credits(master, drawingTable);
+			default:
+				break;
+			}
+		}		
+	} while(!((input == ENTER) && (selected == 3)));
 
 	CleanDrawingTable(*drawingTable);
 	DrawMap(*drawingTable);
-
-	auxPos = DestroyVector2(auxPos);
 	return 1;
 }
