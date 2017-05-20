@@ -12,12 +12,12 @@ Email:
 Date Log:
 */
 
-#include "estructs.h"
-
+#include "Graphics.h"
+#include "Include\Structs.h"
 int main(void)
 {
 	ShowConsoleCursor(FALSE);
-
+	Vector2 aux = ChangeVector2(2, 3);
 	//Important variables.
 	Master GameMaster;
 	char DrawingTable[MAX_HEIGHT][MAX_WIDTH];

@@ -1,5 +1,7 @@
-#include "estructs.h"
-
+#include "Include\Structs.h"
+#include "Graphics.h"
+#include <conio.h>
+#include <Windows.h>
 
 void ShowConsoleCursor(BOOL showFlag)
 {
@@ -49,30 +51,40 @@ void InputBreak()
 	getch();
 }
 
+BOOL InitCamera(CameraPtr camera, Vector2 position)
+{
+	camera->MinBound.x = position.x;
+	camera->MinBound.y = position.y;
+
+	camera->MaxBound.x = position.x + (int)((MAX_WIDTH / 4.0f) + 0.9f);
+	camera->MaxBound.y = position.y + (int)((MAX_HEIGHT / 4.0f) + 0.9f);
+
+	camera->minLenght = position.x + position.y;
+	camera->maxLenght = camera->MaxBound.x + camera->MaxBound.y;
+
+	CleanDrawingTable(camera->viewPort);
+}
 BOOL InsertSelectableText(string text, int x, int y, int currentSelected, int movingSelected, int movedX, int movedY, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
-	Vector2Ptr auxPos = CreateVector2(x, y);
-	BOOL auxBool = TRUE;
+	Vector2 auxPos = ChangeVector2(x, y);
 	if (currentSelected == movingSelected)
-		auxBool = ChangeVector2(auxPos, movedX, movedY);
-	InsertLineInDrawingTable(*drawingTable, auxPos, text);
+		auxPos = ChangeVector2(movedX, movedY);
+	InsertLineInDrawingTable(*drawingTable, auxPos.x, auxPos.y, text);
 
-	auxPos = DestroyVector2(auxPos);
 	return TRUE;
 }
-BOOL InsertLineInDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH], Vector2Ptr position, string text)
+BOOL InsertLineInDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH], int x, int y, string text)
 {
-	Vector2 aux = *position;
 	int lenght = strlen(text);
-	if (position->x > MAX_WIDTH || position->y > MAX_HEIGHT || position->x < 0 || position->y < 0)
+	if (x > MAX_WIDTH || y > MAX_HEIGHT || x < 0 || y < 0)
 		return FALSE;
 	for (int i = 0; i < lenght; i++)
 	{
-		(*drawingTable)[aux.y][aux.x++] = text[i];
-		if (aux.x > MAX_WIDTH)
+		(*drawingTable)[y][x++] = text[i];
+		if (x > MAX_WIDTH)
 		{
-			aux.x = 0;
-			aux.y++;
+			x = 0;
+			y++;
 		}
 
 	}
@@ -86,9 +98,67 @@ BOOL CleanDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 			(*drawingTable)[i][j] = ' ';
 }
 
-int UpdateMap(Master *mainStruct, char *drawingTable[MAX_HEIGHT][MAX_WIDTH])
+int DrawRoom(RoomPtr room, CameraPtr camera)
 {
+	if (strcmp(room->name, "MAIN ROOM" == 0))
+	{
 
+	}
+	else
+	{
+		Vector2 screenPos;
+		screenPos.x = camera->MinBound.x - room->position.x;
+		screenPos.y = camera->MinBound.y - room->position.y;
+
+		string aux;
+
+		if (room->wall[0].WallType == DOOR)
+			strcpy(aux, "## ##");
+		if (room->wall[0].WallType == EMPTY)
+			strcpy(aux, "#####");
+		if (room->wall[0].WallType == WINDOW)
+			strcpy(aux, "##+##");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, aux);
+
+		strcpy(aux, "#   #");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, aux);
+
+
+		screenPos.y++;
+		strcpy(aux, "#   #");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, aux);
+		screenPos.y++;
+		if (room->wall[2].WallType == DOOR)
+			strcpy(aux, "## ##");
+		if (room->wall[2].WallType == EMPTY)
+			strcpy(aux, "#####");
+		if (room->wall[2].WallType == WINDOW)
+			strcpy(aux, "##+##");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y, aux);
+	}
+	return 1;
+}
+int UpdateMap(FloorPtr currentFloor, CameraPtr camera, Vector2 cameraMovement)
+{
+	camera->MinBound.x += cameraMovement.x;
+	camera->MinBound.y += cameraMovement.y;
+	camera->MaxBound.x += cameraMovement.x;
+	camera->MaxBound.y += cameraMovement.y;
+	camera->minLenght = camera->MinBound.x + camera->MinBound.y;
+	camera->maxLenght = camera->MaxBound.x + camera->MaxBound.y;
+
+	RoomPtr roomAux = currentFloor->roomList;
+	while (roomAux)
+	{
+		if (roomAux->positionLenght < camera->minLenght)
+			roomAux = roomAux->next;
+			continue;
+		if (roomAux->positionLenght > camera->maxLenght)
+			break;
+		DrawRoom(roomAux, camera);
+		roomAux = roomAux->next;
+	}
+	//DRAW PLAYERS AND WATNOT
 }
 int DrawMap(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
@@ -98,38 +168,63 @@ int DrawMap(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 }
 void DrawError(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
-	string auxStr = "WRONG INPUT PLEASE TRY AGAIN";
-	Vector2Ptr auxPos = CreateVector2(0, MAX_HEIGHT - 1);
-
-	InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
+	InsertLineInDrawingTable(*drawingTable, 0, MAX_HEIGHT - 1, "WRONG INPUT PLEASE TRY AGAIN");
 }
 
-void Reset_Menu(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+void Manage_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	KEYBOARD input = NONE;
 	unsigned int selected = 0;
-	string auxStr;
-	Vector2Ptr auxPos = CreateVector2(0, 0);
-
+	
 	do
 	{
 		CleanDrawingTable(*drawingTable);
 
-		strcpy(auxStr, "ARE YOU SURE YOU WANT TO RESET ALL DATA?");
-		ChangeVector2(auxPos, 35, 14);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		InsertSelectableText("CREATE", 35, 16, selected, 0, 38, 16, drawingTable);
+		InsertSelectableText("EDIT", 35, 18, selected, 1, 38, 18, drawingTable);
+		InsertSelectableText("DELETE", 35, 20, selected, 2, 38, 20, drawingTable);
+		InsertSelectableText("BACK", 35, 22, selected, 3, 38, 22, drawingTable);
 
-		strcpy(auxStr, "YES");
-		ChangeVector2(auxPos, 35, 16);
-		if (selected == 0)
-			ChangeVector2(auxPos, 38, 16);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
+		DrawMap(*drawingTable);
 
-		strcpy(auxStr, "NO");
-		ChangeVector2(auxPos, 35, 18);
-		if (selected == 1)
-			ChangeVector2(auxPos, 38, 18);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
+		input = ReadInput();
+
+		if (input == DOWN_ARROW && selected < 3)
+			selected++;
+		else if (input == UP_ARROW && selected > 0)
+			selected--;
+		else if (input == ENTER)
+		{
+			switch (selected)
+			{
+			case 0:
+				break;
+			case 1:
+				break;
+			case 2:
+				break;
+			default:
+				break;
+			}
+		}
+
+	} while (!((input == ENTER) && (selected == 3)));
+
+}
+void Reset_Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+{
+	KEYBOARD input = NONE;
+	unsigned int selected = 0;
+
+	do
+	{
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, "RESET ALL DATA");
+		InsertLineInDrawingTable(*drawingTable, 35, 14, "ARE YOU SURE YOU WANT TO RESET ALL DATA?");
+
+		InsertSelectableText("YES", 35, 16, selected, 0, 38, 16, drawingTable);
+		InsertSelectableText("NO", 35, 18, selected, 1, 38, 18, drawingTable);
 
 		DrawMap(*drawingTable);
 
@@ -144,55 +239,34 @@ void Reset_Menu(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 			switch (selected)
 			{
 			case 0:
+				Reset(master);
 				break;
 			default:
 				break;
 			}
 		}
-	} while (1);
-
-	CleanDrawingTable(*drawingTable);
-	DrawMap(*drawingTable);
-
-	auxPos = DestroyVector2(auxPos);
+	} while (input != ENTER);
 }
 void Credits(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	KEYBOARD input = NONE;
-	string auxStr;
-	Vector2Ptr auxPos = CreateVector2(0, 0);
-
 	do
 	{
 		CleanDrawingTable(*drawingTable);
 
+		InsertLineInDrawingTable(*drawingTable, 10, 3, "CREDITS");
 
-		strcpy(auxStr, "CREATES BY:");
-		ChangeVector2(auxPos, 35, 14);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
+		InsertLineInDrawingTable(*drawingTable, 35, 14, "PROGRAMMED BY:");
+		InsertLineInDrawingTable(*drawingTable, 35, 16, "DIOGO PORTELA");
+		InsertLineInDrawingTable(*drawingTable, 35, 18, "PEDRO SILVA");
 
-		strcpy(auxStr, "DIOGO PORTELA");
-		ChangeVector2(auxPos, 35, 16);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
-
-		strcpy(auxStr, "PEDRO SILVA");
-		ChangeVector2(auxPos, 35, 18);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
-
-		strcpy(auxStr, "BACK");
-		ChangeVector2(auxPos, 40, 20);
-		InsertLineInDrawingTable(*drawingTable, auxPos, auxStr);
+		InsertLineInDrawingTable(*drawingTable, 40, 20, "BACK");
 
 		DrawMap(*drawingTable);
 
 		input = ReadInput();
 
 	} while (input != ENTER);
-
-	CleanDrawingTable(*drawingTable);
-	DrawMap(*drawingTable);
-
-	auxPos = DestroyVector2(auxPos);
 }
 void Options(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
@@ -202,6 +276,8 @@ void Options(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	do
 	{
 		CleanDrawingTable(*drawingTable);
+
+		InsertLineInDrawingTable(*drawingTable, 10, 3, "OPTIONS");
 
 		InsertSelectableText("CHARACTERS", 35, 8, selected, 0, 38, 8, drawingTable);
 		InsertSelectableText("EVENTS", 35, 10, selected, 1, 38, 10, drawingTable);
@@ -225,37 +301,38 @@ void Options(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 			switch (selected)
 			{
 			case 0:
+				Manage_Data_Menu(master, "CHARACTERS", drawingTable);
 				break;
 			case 1:
+				Manage_Data_Menu(master, "EVENTS", drawingTable);
 				break;
 			case 2:
+				Manage_Data_Menu(master, "ITEMS", drawingTable);
 				break;
 			case 3:
+				Manage_Data_Menu(master, "MINIONS", drawingTable);
 				break;
 			case 4:
+				Manage_Data_Menu(master, "OMENS", drawingTable);
 				break;
 			case 5:
+				Manage_Data_Menu(master, "ROOMS", drawingTable);
 				break;
 			case 6:
-				break;
+				Reset_Menu(master, drawingTable);
 			default:
 				break;
 			}
 		}
 
 	} while (!((input == ENTER) && (selected == 7)));
-
-	CleanDrawingTable(*drawingTable);
-	DrawMap(*drawingTable);
 }
 void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	KEYBOARD input = NONE;
 	unsigned int selected = 0;
-	Vector2 auxPos;
-	ChangeVector2(&auxPos, 40, 14);
 
-	InsertLineInDrawingTable(*drawingTable, &auxPos, "WELCOME TO BETRAYAL AT HOUSE ON THE HILL");
+	InsertLineInDrawingTable(*drawingTable, 40, 14, "WELCOME TO BETRAYAL AT HOUSE ON THE HILL");
 
 	DrawMap(*drawingTable);
 
@@ -263,6 +340,8 @@ void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	do
 	{
 		CleanDrawingTable(*drawingTable);
+
+		InsertLineInDrawingTable(*drawingTable, 10, 3, "MAIN MENU");
 
 		InsertSelectableText("NEW GAME", 35, 14, selected, 0, 38, 14, drawingTable);
 		InsertSelectableText("OPTIONS", 35, 16, selected, 1, 38, 16, drawingTable);
@@ -293,8 +372,5 @@ void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 			}
 		}		
 	} while(!((input == ENTER) && (selected == 3)));
-
-	CleanDrawingTable(*drawingTable);
-	DrawMap(*drawingTable);
 	return 1;
 }
