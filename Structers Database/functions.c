@@ -264,7 +264,7 @@ Date Log:
 			{
 				for (int j = i; j < master->cards.roomCount - 1; j++)
 					master->cards.roomList[j] = master->cards.roomList[j + 1];
-				master->cards.roomList[master->cards.roomCount--] = *aux;
+				master->cards.roomList[--(master->cards.roomCount)] = *aux;
 				return TRUE;
 			}
 		return FALSE;
@@ -481,7 +481,7 @@ Date Log:
 			{
 				for (int j = i; j < master->cards.minionCount - 1; j++)
 					master->cards.minionList[j] = master->cards.minionList[j + 1];
-				master->cards.minionList[master->cards.minionCount--] = *aux;
+				master->cards.minionList[--(master->cards.minionCount)] = *aux;
 				return TRUE;
 			}
 		return FALSE;
@@ -610,7 +610,7 @@ Date Log:
 				{
 					for (int j = i; j < master->cards.eventCount - 1; j++)
 						master->cards.eventList[j] = master->cards.eventList[j + 1];
-					master->cards.eventList[master->cards.eventCount--] = *aux;
+					master->cards.eventList[--(master->cards.eventCount)] = *aux;
 					return TRUE;
 				}
 			return FALSE;
@@ -726,7 +726,7 @@ Date Log:
 				{
 					for (int j = i; j < master->cards.omenCount - 1; j++)
 						master->cards.omenList[j] = master->cards.omenList[j + 1];
-					master->cards.omenList[master->cards.omenCount--] = *aux;
+					master->cards.omenList[--(master->cards.omenCount)] = *aux;
 					return TRUE;
 				}
 			return FALSE;
@@ -841,7 +841,7 @@ Date Log:
 				{
 					for (int j = i; j < master->cards.itemCount - 1; j++)
 						master->cards.itemList[j] = master->cards.itemList[j + 1];
-					master->cards.itemList[master->cards.itemCount--] = *aux;
+					master->cards.itemList[--(master->cards.itemCount)] = *aux;
 					return TRUE;
 				}
 			return FALSE;
@@ -1011,7 +1011,7 @@ Date Log:
 				{
 					for (int j = i; j < master->cards.charCount - 1; j++)
 						master->cards.characterList[j] = master->cards.characterList[j + 1];
-					master->cards.characterList[master->cards.charCount--] = *aux;
+					master->cards.characterList[--(master->cards.charCount)] = *aux;
 					return TRUE;
 				}
 			return FALSE;

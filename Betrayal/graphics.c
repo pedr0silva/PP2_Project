@@ -63,7 +63,7 @@ string* InsertText(string infoText, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	do
 	{
 		gets(auxStr);
-	}while (strlen(auxStr) == 0);
+	} while (strlen(auxStr) == 0);
 	ShowConsoleCursor(FALSE);
 	return auxStr;
 }
@@ -148,9 +148,146 @@ Camera InitCamera(int x, int y)
 	return camera;
 }
 
+WallType SelectWallType(string msg, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+{
+	KEYBOARD input = NONE;
+	unsigned int selected = 0;
 
+	do
+	{
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, msg);
 
+		InsertSelectableText("EMPY", 35, 16, selected, 0, 38, 16, drawingTable);
+		InsertSelectableText("DOOR", 35, 18, selected, 1, 38, 18, drawingTable);
+		InsertSelectableText("WINDOW", 35, 20, selected, 2, 38, 20, drawingTable);
+		
+		DrawMap(*drawingTable);
+		input = ReadInput();
 
+		if (input == DOWN_ARROW && selected < 2)
+			selected++;
+		else if (input == UP_ARROW && selected > 0)
+			selected--;
+	} while (input != ENTER);
+
+	switch (selected)
+	{
+	case 0:
+		return EMPTY;
+	case 1:
+		return DOOR;
+	default:
+		return WINDOW;
+	}
+}
+int DrawArray(MasterPtr master, string type, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+{
+	KEYBOARD input = NONE;
+	Vector2 topListVec;
+	Camera camera = InitCamera(0, 0);
+	unsigned int selected = 0;
+	int counter;
+	int typeCounterAux = 0;
+	do
+	{
+		CleanDrawingTable(*drawingTable);
+
+		InsertLineInDrawingTable(*drawingTable, 10, 3, "SELECT:");
+
+		topListVec = ChangeVector2(35, 16);
+		counter = 0;
+		topListVec.y -= (selected * 2);
+
+		if (strcmp(type, "CHARACTERS") == 0)
+		{
+			typeCounterAux = master->cards.charCount;
+			for (int i = 0; i < typeCounterAux; i++)
+			{
+				if (IsInCameraView(&camera, topListVec) == TRUE)
+					InsertSelectableText(master->cards.characterList[i].name, topListVec.x, topListVec.y, selected, counter, 38, 16, drawingTable);
+				topListVec.y += 2;
+				counter++;
+			}
+		}
+		else if (strcmp(type, "EVENTS") == 0)
+		{
+			typeCounterAux = master->cards.eventCount;
+			for (int i = 0; i < typeCounterAux; i++)
+			{
+				if (IsInCameraView(&camera, topListVec) == TRUE)
+					InsertSelectableText(master->cards.eventList[i].name, topListVec.x, topListVec.y, selected, counter, 38, 16, drawingTable);
+				topListVec.y += 2;
+				counter++;
+			}
+		}
+		else if (strcmp(type, "ITEMS") == 0)
+		{
+			typeCounterAux = master->cards.itemCount;
+			for (int i = 0; i < typeCounterAux; i++)
+			{
+				if (IsInCameraView(&camera, topListVec) == TRUE)
+					InsertSelectableText(master->cards.itemList[i].name, topListVec.x, topListVec.y, selected, counter, 38, 16, drawingTable);
+				topListVec.y += 2;
+				counter++;
+			}
+		}
+		else if (strcmp(type, "MINIONS") == 0)
+		{
+			typeCounterAux = master->cards.minionCount;
+			for (int i = 0; i < typeCounterAux; i++)
+			{
+				if (IsInCameraView(&camera, topListVec) == TRUE)
+					InsertSelectableText(master->cards.minionList[i].name, topListVec.x, topListVec.y, selected, counter, 38, 16, drawingTable);
+				topListVec.y += 2;
+				counter++;
+			}
+		}
+		else if (strcmp(type, "OMENS") == 0)
+		{
+			typeCounterAux = master->cards.omenCount;
+			for (int i = 0; i < typeCounterAux; i++)
+			{
+				if (IsInCameraView(&camera, topListVec) == TRUE)
+					InsertSelectableText(master->cards.omenList[i].name, topListVec.x, topListVec.y, selected, counter, 38, 16, drawingTable);
+				topListVec.y += 2;
+				counter++;
+			}
+		}
+		else if (strcmp(type, "ROOMS") == 0)
+		{
+			typeCounterAux = master->cards.roomCount;
+			for (int i = 0; i < typeCounterAux; i++)
+			{
+				if (IsInCameraView(&camera, topListVec) == TRUE)
+					InsertSelectableText(master->cards.roomList[i].name, topListVec.x, topListVec.y, selected, counter, 38, 16, drawingTable);
+				topListVec.y += 2;
+				counter++;
+			}
+		}
+
+		InsertSelectableText("NONE", topListVec.x, topListVec.y, selected, counter, 38, 16, drawingTable);
+
+		DrawMap(*drawingTable);
+		input = ReadInput();
+
+		if (input == DOWN_ARROW && selected < typeCounterAux)
+		{
+			selected++;
+			camera = InitCamera(camera.MinBound.x, ++camera.MinBound.y);
+		}
+		else if (input == UP_ARROW && selected > 0)
+		{
+			selected--;
+			camera = InitCamera(camera.MinBound.x, --camera.MinBound.y);
+		}
+		else if (input == ENTER && selected < counter)
+		{
+			return selected;
+		}
+	} while (!((input == ENTER) && (selected == counter)));
+	return -1;
+}
 int DrawRoom(RoomPtr room, CameraPtr camera)
 {
 	if (strcmp(room->name, "MAIN ROOM" == 0))
@@ -224,12 +361,10 @@ BOOL DrawError(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	return TRUE;
 }
 
-
-
-
 void Create_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	string auxStr;
+	string descriptionStr;
 	if (strcmp(type, "CHARACTERS") == 0)
 	{
 		int might, speed, sanity, inteligence;
@@ -258,51 +393,180 @@ void Create_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEI
 		auxChar = CreateChar(auxStr, might, speed, sanity, inteligence);
 		AddCharToArray(master, auxChar);
 	}
+	else if (strcmp(type, "EVENTS") == 0)
+	{
+		int might, speed, sanity, inteligence;
+		EventPtr auxEvent;
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		strcpy(auxStr, InsertText("INSERT NAME:", drawingTable));
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		strcpy(descriptionStr, InsertText("INSERT DESCRIPTIONS:", drawingTable));
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		might = InsertNumber("INSERT MIGHT:", drawingTable);
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		speed = InsertNumber("INSERT SPEED:", drawingTable);
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		sanity = InsertNumber("INSERT SANITY:", drawingTable);
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		inteligence = InsertNumber("INSERT INTELIGENCE:", drawingTable);
+
+		auxEvent = Create_Event(auxStr, descriptionStr, might, speed, sanity, inteligence);
+		AddEventToArray(master, auxEvent);
+	}
+	else if (strcmp(type, "ITEMS") == 0)
+	{
+		int might, speed, sanity, inteligence;
+		ItemPtr auxItem;
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		strcpy(auxStr, InsertText("INSERT NAME:", drawingTable));
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		strcpy(descriptionStr, InsertText("INSERT DESCRIPTIONS:", drawingTable));
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		might = InsertNumber("INSERT MIGHT:", drawingTable);
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		speed = InsertNumber("INSERT SPEED:", drawingTable);
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		sanity = InsertNumber("INSERT SANITY:", drawingTable);
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		inteligence = InsertNumber("INSERT INTELIGENCE:", drawingTable);
+
+		auxItem = CreateItem(auxStr, descriptionStr, might, speed, sanity, inteligence);
+		AddItemToArray(master, auxItem);
+	}
+	else if (strcmp(type, "MINIONS") == 0)
+	{
+		int might, speed, sanity, inteligence;
+		MinionPtr auxMinion;
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		strcpy(auxStr, InsertText("INSERT NAME:", drawingTable));
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		might = InsertNumber("INSERT MIGHT:", drawingTable);
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		speed = InsertNumber("INSERT SPEED:", drawingTable);
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		sanity = InsertNumber("INSERT SANITY:", drawingTable);
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		inteligence = InsertNumber("INSERT INTELIGENCE:", drawingTable);
+
+		auxMinion = CreateMinion(auxStr, might, speed, sanity, inteligence);
+		AddMinionToArray(master, auxMinion);
+	}
+	else if (strcmp(type, "OMENS") == 0)
+	{
+		int might, speed, sanity, inteligence;
+		OmenPtr auxOmen;
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		strcpy(auxStr, InsertText("INSERT NAME:", drawingTable));
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		strcpy(descriptionStr, InsertText("INSERT DESCRIPTIONS:", drawingTable));
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		might = InsertNumber("INSERT MIGHT:", drawingTable);
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		speed = InsertNumber("INSERT SPEED:", drawingTable);
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		sanity = InsertNumber("INSERT SANITY:", drawingTable);
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		inteligence = InsertNumber("INSERT INTELIGENCE:", drawingTable);
+
+		auxOmen = CreateOmen(auxStr, descriptionStr, might, speed, sanity, inteligence);
+		AddOmenToArray(master, auxOmen);
+	}
+	else if (strcmp(type, "ROOMS") == 0)
+	{
+		RoomPtr auxRoom;
+		EventPtr eventSelectedPtr;
+		OmenPtr omenSelectedPtr;
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		strcpy(auxStr, InsertText("INSERT NAME:", drawingTable));
+
+		int eventSelected = DrawArray(master, "EVENTS", drawingTable);
+		if (eventSelected > -1)
+			eventSelectedPtr = &(master->cards.eventList[eventSelected]);
+		else
+			eventSelectedPtr = NULL;
+
+		int omenSelected = DrawArray(master, "OMENS", drawingTable);
+		if (omenSelected > -1)
+			omenSelectedPtr = &(master->cards.omenList[omenSelected]);
+		else
+			omenSelectedPtr = NULL;
+
+		WallType up = SelectWallType("Upper Wall", drawingTable);
+		WallType left = SelectWallType("Left Wall", drawingTable);
+		WallType down = SelectWallType("Down Wall", drawingTable);
+		WallType right = SelectWallType("Right Wall", drawingTable);
+
+		auxRoom = CreateRoom(auxStr, eventSelectedPtr, omenSelectedPtr, up, left, down, right);
+		AddRoomToArray(master, auxRoom);
+	}
+
 }
 void Delete_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
-	KEYBOARD input = NONE;
-	Vector2 topListVec;
-	Camera camera = InitCamera(0, 0);
-	unsigned int selected = 0;
-	int counter;
-	do
+	int result = DrawArray(master, type, drawingTable);
+	if (result > -1)
 	{
-		CleanDrawingTable(*drawingTable);
-
-		InsertLineInDrawingTable(*drawingTable, 10, 3, "DELETE");
-
-		topListVec = ChangeVector2(35, 16);
-		counter = 0;
-		topListVec.y -= (selected * 2);
-		for (int i = 0; i < master->cards.charCount; i++)
-		{
-			if (IsInCameraView(&camera, topListVec) == TRUE)
-				InsertSelectableText(master->cards.characterList[i].name, topListVec.x, topListVec.y, selected, counter, 38, 16, drawingTable);
-			topListVec.y += 2;
-			counter++;
-		}
-		InsertSelectableText("BACK", topListVec.x, topListVec.y, selected, counter, 38, 16, drawingTable);
-
-		DrawMap(*drawingTable);
-
-		input = ReadInput();
-
-		if (input == DOWN_ARROW && selected < master->cards.charCount)
-		{
-			selected++;
-			camera = InitCamera(camera.MinBound.x, ++camera.MinBound.y);
-		}
-		else if (input == UP_ARROW && selected > 0)
-		{
-			selected--;
-			camera = InitCamera(camera.MinBound.x, --camera.MinBound.y);
-		}
-		else if (input == ENTER && selected < counter)
-		{
-			RemoveCharFromArray(master, master->cards.characterList[selected].name);
-		}
-	} while (!((input == ENTER) && (selected == counter)));
+		if (strcmp(type, "CHARACTERS") == 0)
+			RemoveCharFromArray(master, master->cards.characterList[result].name);
+		else if (strcmp(type, "EVENTS") == 0)
+			RemoveEventFromArray(master, master->cards.eventList[result].name);
+		else if (strcmp(type, "ITEMS") == 0)
+			RemoveItemFromArray(master, master->cards.itemList[result].name);
+		else if (strcmp(type, "MINIONS") == 0)
+			RemoveMinionFromArray(master, master->cards.minionList[result].name);
+		else if (strcmp(type, "OMENS") == 0)
+			RemoveOmentFromArray(master, master->cards.omenList[result].name);
+		else if (strcmp(type, "ROOMS") == 0)
+			RemoveRoomFromArray(master, master->cards.roomList[result].name);
+	}
 }
 void Manage_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
