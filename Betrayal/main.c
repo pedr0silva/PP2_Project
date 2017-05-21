@@ -17,11 +17,10 @@ Date Log:
 int main(void)
 {
 	ShowConsoleCursor(FALSE);
-	Vector2 aux = ChangeVector2(2, 3);
+
 	//Important variables.
 	Master GameMaster;
 	char DrawingTable[MAX_HEIGHT][MAX_WIDTH];
-	CleanDrawingTable(&DrawingTable);
 
 	BOOL start = LoadMaster(&GameMaster);
 	if (start == FALSE)

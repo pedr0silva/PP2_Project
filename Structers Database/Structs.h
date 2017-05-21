@@ -57,6 +57,10 @@ Date Log:
 		#ifndef MAX_STRING
 		#define MAX_STRING 512
 		#endif // !MAX_STRING
+		#ifndef ROOM_SIZE
+		#define ROOM_SIZE 1
+		#endif // ROOM_SIZE
+
 	#pragma endregion
 	#pragma region AUXILIARY STRUCTS
 		#ifndef STRING
@@ -68,14 +72,6 @@ Date Log:
 			#define FALSE 0
 			typedef int BOOL;
 		#endif // TRUE
-		typedef enum {
-			WALL_HORIZONTAL = '-',
-			WALL_VERTICAL = '|',
-			WALL_TOP_CORNER = '.',
-			WALL_BOTTOM_CORNER = '\'',
-			WALL_SIDE_CORNER = ':',
-			WALL_CENTER = '+',
-		} WALLS;
 		struct history
 		{
 			string turn;
@@ -161,10 +157,10 @@ Date Log:
 	};
 	struct Character
 	{
-		Vector2 position;
-		RoomPtr room;
 		string name;
 		int might, speed, sanity, inteligence;
+		Vector2 position;
+		RoomPtr room;
 		MinionPtr minions;
 		ItemPtr items;
 		HistoryPtr history;
@@ -172,16 +168,16 @@ Date Log:
 	};
 	struct Card
 	{
-		Item itemList[MAX_ITEMS];
-		unsigned int itemCount;
-		Omen omenList[MAX_OMENS];
-		unsigned int omenCount;
-		Event eventList[MAX_EVENTS];
-		unsigned int eventCount;
 		Character characterList[MAX_CHARACTERS];
 		unsigned int charCount;
+		Event eventList[MAX_EVENTS];
+		unsigned int eventCount;
+		Item itemList[MAX_ITEMS];
+		unsigned int itemCount;		
 		Minion minionList[MAX_MINIONS];
 		unsigned int minionCount;
+		Omen omenList[MAX_OMENS];
+		unsigned int omenCount;
 		Room roomList[MAX_ROOMS];
 		unsigned int roomCount;
 	};
@@ -190,10 +186,10 @@ Date Log:
 #pragma region MASTER
 	struct Master
 	{
-		int omenTrack;
-		CharacterPtr characterList;
-		Map map;
 		Card cards;
+		Map map;
+		CharacterPtr characterList;
+		int omenTrack;
 	};
 	typedef struct Master Master, *MasterPtr;
 #pragma endregion
@@ -267,7 +263,7 @@ Date Log:
 		__declspec(dllexport) CharacterPtr CreateChar(string name, int might, int speed, int sanity, int inteligence);
 		__declspec(dllexport) CharacterPtr AddCharToList(CharacterPtr head, CharacterPtr node);
 		__declspec(dllexport) BOOL AddCharToArray(MasterPtr master, CharacterPtr node);
-		__declspec(dllexport) BOOL RemovecharFromArray(MasterPtr master, string node);
+		__declspec(dllexport) BOOL RemoveCharFromArray(MasterPtr master, string node);
 		__declspec(dllexport) CharacterPtr RemoveCharFromList(CharacterPtr head, string name);
 		__declspec(dllexport) CharacterPtr DestroyChar(CharacterPtr node);
 		__declspec(dllexport) CharacterPtr DestroyCharList(CharacterPtr head);

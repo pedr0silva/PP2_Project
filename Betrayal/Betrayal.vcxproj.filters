@@ -21,10 +21,16 @@
     <ClCompile Include="graphics.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Structers Database\functions.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Structers Database\Structs.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

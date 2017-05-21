@@ -3,13 +3,14 @@
 #include <conio.h>
 #include <Windows.h>
 
-void ShowConsoleCursor(BOOL showFlag)
+BOOL ShowConsoleCursor(BOOL showFlag)
 {
 	HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO     cursorInfo;
 	GetConsoleCursorInfo(out, &cursorInfo);
 	cursorInfo.bVisible = showFlag; // set the cursor visibility
 	SetConsoleCursorInfo(out, &cursorInfo);
+	return TRUE;
 }
 KEYBOARD ReadInput()
 {
@@ -46,24 +47,45 @@ KEYBOARD ReadInput()
 		return NONE;
 	}
 }
-void InputBreak()
+BOOL InputBreak()
 {
 	getch();
+	return TRUE;
 }
-
-BOOL InitCamera(CameraPtr camera, Vector2 position)
+string* InsertText(string infoText, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
-	camera->MinBound.x = position.x;
-	camera->MinBound.y = position.y;
+	string auxStr;
+	InsertLineInDrawingTable(*drawingTable, 0, MAX_HEIGHT - 1, infoText);
+	DrawMap(*drawingTable);
 
-	camera->MaxBound.x = position.x + (int)((MAX_WIDTH / 4.0f) + 0.9f);
-	camera->MaxBound.y = position.y + (int)((MAX_HEIGHT / 4.0f) + 0.9f);
-
-	camera->minLenght = position.x + position.y;
-	camera->maxLenght = camera->MaxBound.x + camera->MaxBound.y;
-
-	CleanDrawingTable(camera->viewPort);
+	printf("\n");
+	ShowConsoleCursor(TRUE);
+	do
+	{
+		gets(auxStr);
+	}while (strlen(auxStr) == 0);
+	ShowConsoleCursor(FALSE);
+	return auxStr;
 }
+int InsertNumber(string infoText, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+{
+	int auxInt;
+
+	InsertLineInDrawingTable(*drawingTable, 0, MAX_HEIGHT - 1, infoText);
+	DrawMap(*drawingTable);
+
+	printf("\n");
+	ShowConsoleCursor(TRUE);
+	do
+	{
+		scanf("%d", &auxInt);
+	} while (auxInt < 0);
+	ShowConsoleCursor(FALSE);
+
+	return auxInt;
+}
+
+
 BOOL InsertSelectableText(string text, int x, int y, int currentSelected, int movingSelected, int movedX, int movedY, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	Vector2 auxPos = ChangeVector2(x, y);
@@ -96,7 +118,38 @@ BOOL CleanDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	for (int i = 0; i < MAX_HEIGHT; i++)
 		for (int j = 0; j < MAX_WIDTH; j++)
 			(*drawingTable)[i][j] = ' ';
+	return TRUE;
 }
+Vector2 WorldToCameraPos(CameraPtr camera, Vector2 worldPosition)
+{
+	Vector2 result;
+	result.x = worldPosition.x - camera->MinBound.x;
+	result.x = worldPosition.y - camera->MinBound.y;
+
+	return result;
+}
+BOOL IsInCameraView(CameraPtr camera, Vector2 worldPosition)
+{
+	int x = worldPosition.x - camera->MinBound.x;
+	int y = worldPosition.y - camera->MinBound.y;
+	if (x > 0 && x < MAX_WIDTH && y > 0 && y < MAX_HEIGHT)
+		return TRUE;
+	return FALSE;
+}
+Camera InitCamera(int x, int y)
+{
+	Camera camera;
+	camera.MinBound.x = x;
+	camera.MinBound.y = y;
+
+	camera.minLenght = x + y;
+
+	CleanDrawingTable(camera.viewPort);
+	return camera;
+}
+
+
+
 
 int DrawRoom(RoomPtr room, CameraPtr camera)
 {
@@ -142,19 +195,18 @@ int UpdateMap(FloorPtr currentFloor, CameraPtr camera, Vector2 cameraMovement)
 {
 	camera->MinBound.x += cameraMovement.x;
 	camera->MinBound.y += cameraMovement.y;
-	camera->MaxBound.x += cameraMovement.x;
-	camera->MaxBound.y += cameraMovement.y;
 	camera->minLenght = camera->MinBound.x + camera->MinBound.y;
-	camera->maxLenght = camera->MaxBound.x + camera->MaxBound.y;
 
 	RoomPtr roomAux = currentFloor->roomList;
 	while (roomAux)
 	{
 		if (roomAux->positionLenght < camera->minLenght)
+		{
 			roomAux = roomAux->next;
 			continue;
-		if (roomAux->positionLenght > camera->maxLenght)
-			break;
+		}
+		/*if (roomAux->positionLenght > camera->maxLenght)
+			break;*/
 		DrawRoom(roomAux, camera);
 		roomAux = roomAux->next;
 	}
@@ -166,16 +218,96 @@ int DrawMap(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 		for (int j = 0; j < MAX_WIDTH; j++)
 			cprintf("%c", (*drawingTable)[i][j]);
 }
-void DrawError(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+BOOL DrawError(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	InsertLineInDrawingTable(*drawingTable, 0, MAX_HEIGHT - 1, "WRONG INPUT PLEASE TRY AGAIN");
+	return TRUE;
 }
 
+
+
+
+void Create_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+{
+	string auxStr;
+	if (strcmp(type, "CHARACTERS") == 0)
+	{
+		int might, speed, sanity, inteligence;
+		CharacterPtr auxChar;
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		strcpy(auxStr, InsertText("INSERT NAME:", drawingTable));
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		might = InsertNumber("INSERT MIGHT:", drawingTable);
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		speed = InsertNumber("INSERT SPEED:", drawingTable);
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		sanity = InsertNumber("INSERT SANITY:", drawingTable);
+
+		CleanDrawingTable(*drawingTable);
+		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+		inteligence = InsertNumber("INSERT INTELIGENCE:", drawingTable);
+
+		auxChar = CreateChar(auxStr, might, speed, sanity, inteligence);
+		AddCharToArray(master, auxChar);
+	}
+}
+void Delete_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+{
+	KEYBOARD input = NONE;
+	Vector2 topListVec;
+	Camera camera = InitCamera(0, 0);
+	unsigned int selected = 0;
+	int counter;
+	do
+	{
+		CleanDrawingTable(*drawingTable);
+
+		InsertLineInDrawingTable(*drawingTable, 10, 3, "DELETE");
+
+		topListVec = ChangeVector2(35, 16);
+		counter = 0;
+		topListVec.y -= (selected * 2);
+		for (int i = 0; i < master->cards.charCount; i++)
+		{
+			if (IsInCameraView(&camera, topListVec) == TRUE)
+				InsertSelectableText(master->cards.characterList[i].name, topListVec.x, topListVec.y, selected, counter, 38, 16, drawingTable);
+			topListVec.y += 2;
+			counter++;
+		}
+		InsertSelectableText("BACK", topListVec.x, topListVec.y, selected, counter, 38, 16, drawingTable);
+
+		DrawMap(*drawingTable);
+
+		input = ReadInput();
+
+		if (input == DOWN_ARROW && selected < master->cards.charCount)
+		{
+			selected++;
+			camera = InitCamera(camera.MinBound.x, ++camera.MinBound.y);
+		}
+		else if (input == UP_ARROW && selected > 0)
+		{
+			selected--;
+			camera = InitCamera(camera.MinBound.x, --camera.MinBound.y);
+		}
+		else if (input == ENTER && selected < counter)
+		{
+			RemoveCharFromArray(master, master->cards.characterList[selected].name);
+		}
+	} while (!((input == ENTER) && (selected == counter)));
+}
 void Manage_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	KEYBOARD input = NONE;
 	unsigned int selected = 0;
-	
 	do
 	{
 		CleanDrawingTable(*drawingTable);
@@ -199,10 +331,12 @@ void Manage_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEI
 			switch (selected)
 			{
 			case 0:
+				Create_Data_Menu(master, type, drawingTable);
 				break;
 			case 1:
 				break;
 			case 2:
+				Delete_Data_Menu(master, type, drawingTable);
 				break;
 			default:
 				break;
@@ -210,7 +344,6 @@ void Manage_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEI
 		}
 
 	} while (!((input == ENTER) && (selected == 3)));
-
 }
 void Reset_Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
@@ -332,6 +465,7 @@ void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	KEYBOARD input = NONE;
 	unsigned int selected = 0;
 
+	CleanDrawingTable(*drawingTable);
 	InsertLineInDrawingTable(*drawingTable, 40, 14, "WELCOME TO BETRAYAL AT HOUSE ON THE HILL");
 
 	DrawMap(*drawingTable);
@@ -349,7 +483,7 @@ void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 		InsertSelectableText("EXIT", 35, 20, selected, 3, 38, 20, drawingTable);
 
 		DrawMap(*drawingTable);
-		
+
 		input = ReadInput();
 
 		if (input == DOWN_ARROW && selected < 3)
@@ -370,7 +504,7 @@ void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 			default:
 				break;
 			}
-		}		
-	} while(!((input == ENTER) && (selected == 3)));
+		}
+	} while (!((input == ENTER) && (selected == 3)));
 	return 1;
 }

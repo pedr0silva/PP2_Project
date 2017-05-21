@@ -4,6 +4,15 @@
 #define MAX_HEIGHT 29
 #define MAX_WIDTH 120
 
+typedef enum {
+	WALL_HORIZONTAL = '-',
+	WALL_VERTICAL = '|',
+	WALL_TOP_CORNER = '.',
+	WALL_BOTTOM_CORNER = '\'',
+	WALL_SIDE_CORNER = ':',
+	WALL_CENTER = '+',
+} WALLS;
+
 typedef enum
 {
 	NONE,
@@ -20,8 +29,6 @@ struct camera
 {
 	Vector2 MinBound;
 	int minLenght;
-	Vector2 MaxBound;
-	int maxLenght;
 	char viewPort[MAX_HEIGHT][MAX_WIDTH];
 };
 typedef struct camera Camera, *CameraPtr;

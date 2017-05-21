@@ -259,10 +259,10 @@ Date Log:
 	BOOL RemoveRoomFromArray(MasterPtr master, string node)
 	{
 		RoomPtr aux = CreateRoom(NULL, NULL, NULL, EMPTY, EMPTY, EMPTY, EMPTY);
-		for(int i = 0; i > master->cards.roomCount; i++)
+		for(int i = 0; i < master->cards.roomCount; i++)
 			if (strcmp(master->cards.roomList[i].name, node) == 0)
 			{
-				for (int j = i; j > master->cards.roomCount - 1; i++)
+				for (int j = i; j < master->cards.roomCount - 1; j++)
 					master->cards.roomList[j] = master->cards.roomList[j + 1];
 				master->cards.roomList[master->cards.roomCount--] = *aux;
 				return TRUE;
@@ -329,13 +329,13 @@ Date Log:
 		{
 			vectorAux = currentRoom->position;
 			if (direction == UP)
-				vectorAux.y++;
+				vectorAux.y += ROOM_SIZE;
 			else if (direction == LEFT)
-				vectorAux.x--;
+				vectorAux.x -= ROOM_SIZE;
 			else if (direction == DOWN)
-				vectorAux.y--;
+				vectorAux.y -= ROOM_SIZE;
 			else if (direction == RIGHT)
-				vectorAux.x++;
+				vectorAux.x += ROOM_SIZE;;
 
 			roomRandom = RandomRoom(master);
 
@@ -476,10 +476,10 @@ Date Log:
 	BOOL RemoveMinionFromArray(MasterPtr master, string node)
 	{
 		MinionPtr aux = CreateMinion(NULL, 0, 0, 0, 0);
-		for (int i = 0; i > master->cards.minionCount; i++)
+		for (int i = 0; i < master->cards.minionCount; i++)
 			if (strcmp(master->cards.minionList[i].name, node) == 0)
 			{
-				for (int j = i; j > master->cards.minionCount - 1; i++)
+				for (int j = i; j < master->cards.minionCount - 1; j++)
 					master->cards.minionList[j] = master->cards.minionList[j + 1];
 				master->cards.minionList[master->cards.minionCount--] = *aux;
 				return TRUE;
@@ -605,10 +605,10 @@ Date Log:
 		BOOL RemoveEventFromArray(MasterPtr master, string node)
 		{
 			EventPtr aux = Create_Event(NULL, NULL, 0, 0, 0, 0);
-			for (int i = 0; i > master->cards.eventCount; i++)
+			for (int i = 0; i < master->cards.eventCount; i++)
 				if (strcmp(master->cards.eventList[i].name, node) == 0)
 				{
-					for (int j = i; j > master->cards.eventCount - 1; i++)
+					for (int j = i; j < master->cards.eventCount - 1; j++)
 						master->cards.eventList[j] = master->cards.eventList[j + 1];
 					master->cards.eventList[master->cards.eventCount--] = *aux;
 					return TRUE;
@@ -721,10 +721,10 @@ Date Log:
 		BOOL RemoveOmentFromArray(MasterPtr master, string node)
 		{
 			OmenPtr aux = CreateOmen(NULL, NULL, 0, 0, 0, 0);
-			for (int i = 0; i > master->cards.omenCount; i++)
+			for (int i = 0; i < master->cards.omenCount; i++)
 				if (strcmp(master->cards.omenList[i].name, node) == 0)
 				{
-					for (int j = i; j > master->cards.omenCount - 1; i++)
+					for (int j = i; j < master->cards.omenCount - 1; j++)
 						master->cards.omenList[j] = master->cards.omenList[j + 1];
 					master->cards.omenList[master->cards.omenCount--] = *aux;
 					return TRUE;
@@ -836,10 +836,10 @@ Date Log:
 		BOOL RemoveItemFromArray(MasterPtr master, string node)
 		{
 			ItemPtr aux = CreateItem(NULL, NULL, 0, 0, 0, 0);
-			for (int i = 0; i > master->cards.itemCount; i++)
+			for (int i = 0; i < master->cards.itemCount; i++)
 				if (strcmp(master->cards.itemList[i].name, node) == 0)
 				{
-					for (int j = i; j > master->cards.itemCount - 1; i++)
+					for (int j = i; j < master->cards.itemCount - 1; j++)
 						master->cards.itemList[j] = master->cards.itemList[j + 1];
 					master->cards.itemList[master->cards.itemCount--] = *aux;
 					return TRUE;
@@ -958,10 +958,6 @@ Date Log:
 
 			aux->position.x = 0;
 			aux->position.y = 0;
-			if (name != NULL)
-				strcpy(aux->name, strupr(name));
-			else
-				strcpy(aux->name, "NULL");
 			aux->might = might;
 			aux->speed = speed;
 			aux->sanity = sanity;
@@ -971,7 +967,10 @@ Date Log:
 			aux->items = NULL;
 			aux->room = NULL;
 			aux->next = NULL;
-
+			if (name != NULL)
+				strcpy(aux->name, strupr(name));
+			else
+				strcpy(aux->name, "NULL");
 			return aux;
 		}
 		//Adds a Character to a CharacterList.
@@ -1004,13 +1003,13 @@ Date Log:
 			return FALSE;
 		}
 		//Removes a Character from the CharacterArray.
-		BOOL RemovecharFromArray(MasterPtr master, string node)
+		BOOL RemoveCharFromArray(MasterPtr master, string node)
 		{
 			CharacterPtr aux = CreateChar(NULL, 0, 0, 0, 0);
-			for (int i = 0; i > master->cards.charCount; i++)
+			for (int i = 0; i < master->cards.charCount; i++)
 				if (strcmp(master->cards.characterList[i].name, node) == 0)
 				{
-					for (int j = i; j > master->cards.charCount - 1; i++)
+					for (int j = i; j < master->cards.charCount - 1; j++)
 						master->cards.characterList[j] = master->cards.characterList[j + 1];
 					master->cards.characterList[master->cards.charCount--] = *aux;
 					return TRUE;
@@ -1115,7 +1114,6 @@ unsigned int DiceRoll(int stat)
 	//Resests all data of a Master.
 	BOOL Reset(MasterPtr master)
 	{
-		//master->characterList = DestroyCharList(master->characterList);
 		CharacterPtr auxchar = CreateChar(NULL, 0, 0, 0, 0);
 		EventPtr auxevent = Create_Event(NULL, NULL, 0, 0, 0, 0);
 		ItemPtr auxitem = CreateItem(NULL, NULL, 0, 0, 0, 0);
