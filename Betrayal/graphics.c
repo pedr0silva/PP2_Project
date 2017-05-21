@@ -85,7 +85,6 @@ int InsertNumber(string infoText, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	return auxInt;
 }
 
-
 BOOL InsertSelectableText(string text, int x, int y, int currentSelected, int movingSelected, int movedX, int movedY, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	Vector2 auxPos = ChangeVector2(x, y);
@@ -361,6 +360,18 @@ BOOL DrawError(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	return TRUE;
 }
 
+void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+{
+	int stopGame = 1;
+	KEYBOARD input = NONE;
+	while (stopGame)
+	{
+		DrawMap(drawingTable);
+		input = ReadInput();
+	}
+}
+
+//MENUS
 void Create_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	string auxStr;
@@ -549,6 +560,10 @@ void Create_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEI
 	}
 
 }
+void Edit_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+{
+
+}
 void Delete_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	int result = DrawArray(master, type, drawingTable);
@@ -598,6 +613,7 @@ void Manage_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEI
 				Create_Data_Menu(master, type, drawingTable);
 				break;
 			case 1:
+				Edit_Data_Menu(master, type, drawingTable);
 				break;
 			case 2:
 				Delete_Data_Menu(master, type, drawingTable);

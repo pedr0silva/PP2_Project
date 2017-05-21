@@ -263,7 +263,7 @@ Date Log:
 		__declspec(dllexport) CharacterPtr CreateChar(string name, int might, int speed, int sanity, int inteligence);
 		__declspec(dllexport) CharacterPtr AddCharToList(CharacterPtr head, CharacterPtr node);
 		__declspec(dllexport) BOOL AddCharToArray(MasterPtr master, CharacterPtr node);
-		__declspec(dllexport) BOOL RemovecharFromArray(MasterPtr master, string node);
+		__declspec(dllexport) BOOL RemoveCharFromArray(MasterPtr master, string node);
 		__declspec(dllexport) CharacterPtr RemoveCharFromList(CharacterPtr head, string name);
 		__declspec(dllexport) CharacterPtr DestroyChar(CharacterPtr node);
 		__declspec(dllexport) CharacterPtr DestroyCharList(CharacterPtr head);

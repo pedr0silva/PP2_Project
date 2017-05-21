@@ -72,7 +72,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Users\darap\Desktop\IPCA\Projecto- PP2\PP2_Project\Betrayal\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\darap\Desktop\IPCA\Projecto- PP2\PP2_Project\Betrayal\Lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\darap\Desktop\IPCA\Paradigmas\PP2_Project\Betrayal\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -154,12 +154,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Structers Database\functions.c" />
     <ClCompile Include="graphics.c" />
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Structers Database\Structs.h" />
     <ClInclude Include="Graphics.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
