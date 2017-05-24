@@ -3,6 +3,27 @@
 #include <conio.h>
 #include <Windows.h>
 
+#pragma region FUNCOES A PASSAR PARA A DLL
+
+//Asigns a character to a player
+BOOL AsignPlayer(MasterPtr *master, int playerNumber, CharacterPtr selectedChar)
+{
+	CharacterPtr aux = (*master)->characterList;
+	if (aux == NULL)
+		return FALSE;
+	else
+		if (aux->next == NULL)
+		{
+			selectedChar->playerNumber = playerNumber;
+			aux->next = selectedChar;
+			return TRUE;
+		}
+		else
+			AsignPlayer(master, playerNumber, selectedChar);
+}
+#pragma endregion
+
+
 BOOL ShowConsoleCursor(BOOL showFlag)
 {
 	HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -663,13 +684,14 @@ void Reset_Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 void Create_Player_Menu(MasterPtr master, int numPlayers, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	string p = "CHARACTER SELECTION - PLAYER X";
+	CharacterPtr aux = master->cards.characterList;
 
-	for (int i = 0, playerNumber = 49; i < numPlayers; i++, playerNumber++)
+	for (int playerNumber = 0, ASCIIconversion = 49; playerNumber < numPlayers; ASCIIconversion++, playerNumber++)
 	{
 		KEYBOARD input = NONE;
 		unsigned int selected = 0;
 
-		p[27] = playerNumber;
+		p[27] = ASCIIconversion;
 
 		do
 		{
@@ -677,49 +699,71 @@ void Create_Player_Menu(MasterPtr master, int numPlayers, char(*drawingTable)[MA
 
 			InsertLineInDrawingTable(*drawingTable, 10, 3, p);
 
-			InsertSelectableText(("%s - %d, %d, %d, %d", master->cards.characterList->name,
-				master->cards.characterList->might, master->cards.characterList->speed,
-				master->cards.characterList->sanity, master->cards.characterList->inteligence),
-				35, 8, selected, 0, 38, 8, drawingTable);
-			InsertSelectableText(("%s - %d, %d, %d, %d", master->cards.characterList->next->name,
-				master->cards.characterList->next->might, master->cards.characterList->next->speed,
-				master->cards.characterList->next->sanity, master->cards.characterList->next->inteligence),
-				35, 10, selected, 1, 38, 10, drawingTable);
-			InsertSelectableText(("%s - %d, %d, %d, %d", master->cards.characterList->next->next->name,
-				master->cards.characterList->next->next->might, master->cards.characterList->next->next->speed,
-				master->cards.characterList->next->next->sanity, master->cards.characterList->next->next->inteligence),
-				35, 12, selected, 2, 38, 12, drawingTable);
-			
+			for (int j = 0, y = 8; j < MAX_CHARACTERS; j++, y+2)  //terá espaco no ecra para tudo?
+			{
+				//deviamos eliminar ou arrajar outra forma de destacar os characters ja escolhidos.
+				InsertSelectableText(("%s - %d, %d, %d, %d", aux->name, aux->might, aux->speed,	aux->sanity, aux->inteligence),
+					35, y, selected, j, 38, y, drawingTable);
+				aux = aux->next;
+			}
+
+			//1 linha para o back
 
 			DrawMap(*drawingTable);
 
 			input = ReadInput();
 
-			if (input == DOWN_ARROW && selected < 4)
+			if (input == DOWN_ARROW && selected < 12)
 				selected++;
 			else if (input == UP_ARROW && selected > 0)
 				selected--;
 			else if (input == ENTER)
 			{
+				aux = master->cards.characterList; //voltar ao inicio
+
 				switch (selected)
 				{
 				case 0:
-					Create_Player_Menu(master, 3, drawingTable);
+					AsignPlayer(master, playerNumber, aux);
 					break;
 				case 1:
-					Create_Player_Menu(master, 4, drawingTable);
+					AsignPlayer(master, playerNumber, aux->next);
 					break;
 				case 2:
-					Create_Player_Menu(master, 5, drawingTable);
+					AsignPlayer(master, playerNumber, aux->next->next);
 					break;
 				case 3:
-					Create_Player_Menu(master, 6, drawingTable);
+					AsignPlayer(master, playerNumber, aux->next->next->next);
+					break;
+				case 4:
+					AsignPlayer(master, playerNumber, aux->next->next->next->next);
+					break;
+				case 5:
+					AsignPlayer(master, playerNumber, aux->next->next->next->next->next);
+					break;
+				case 6:
+					AsignPlayer(master, playerNumber, aux->next->next->next->next->next->next);
+					break;
+				case 7:
+					AsignPlayer(master, playerNumber, aux->next->next->next->next->next->next->next);
+					break;
+				case 8:
+					AsignPlayer(master, playerNumber, aux->next->next->next->next->next->next->next->next);
+					break;
+				case 9:
+					AsignPlayer(master, playerNumber, aux->next->next->next->next->next->next->next->next->next);
+					break;
+				case 10:
+					AsignPlayer(master, playerNumber, aux->next->next->next->next->next->next->next->next->next->next);
+					break;
+				case 11:
+					AsignPlayer(master, playerNumber, aux->next->next->next->next->next->next->next->next->next->next->next);
 					break;
 				default:
 					break;
 				}
 			}
-		} while (!((input == ENTER) && (selected == 4)));
+		} while (!((input == ENTER) && (selected == 12)));
 
 	}
 }
@@ -856,9 +900,9 @@ void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	unsigned int selected = 0;
 
 	CleanDrawingTable(*drawingTable);
-	textcolor(2);
+
 	InsertLineInDrawingTable(*drawingTable, 40, 14, "WELCOME TO BETRAYAL AT HOUSE ON THE HILL");
-	textcolor(0);
+
 	DrawMap(*drawingTable);
 
 	InputBreak();

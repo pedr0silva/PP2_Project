@@ -28,6 +28,7 @@ Date Log:
 
 #include <stdio.h>
 #include <string.h>
+
 #pragma region GENERAL
 	#pragma region CONSTANTS
 		#ifndef MAX_CARDS
@@ -159,6 +160,7 @@ Date Log:
 	{
 		string name;
 		int might, speed, sanity, inteligence;
+		int playerNumber;
 		Vector2 position;
 		RoomPtr room;
 		MinionPtr minions;

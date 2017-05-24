@@ -962,6 +962,7 @@ Date Log:
 			aux->speed = speed;
 			aux->sanity = sanity;
 			aux->inteligence = inteligence;
+			aux->playerNumber = 0;
 			aux->history = NULL;
 			aux->minions = NULL;
 			aux->items = NULL;
