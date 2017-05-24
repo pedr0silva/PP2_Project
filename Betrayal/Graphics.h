@@ -1,4 +1,3 @@
-#pragma once
 #include "Include\Structs.h"
 
 #define MAX_HEIGHT 29

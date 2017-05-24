@@ -160,7 +160,7 @@ WallType SelectWallType(string msg, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 		InsertSelectableText("EMPY", 35, 16, selected, 0, 38, 16, drawingTable);
 		InsertSelectableText("DOOR", 35, 18, selected, 1, 38, 18, drawingTable);
 		InsertSelectableText("WINDOW", 35, 20, selected, 2, 38, 20, drawingTable);
-		
+
 		DrawMap(*drawingTable);
 		input = ReadInput();
 
@@ -660,6 +660,116 @@ void Reset_Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 		}
 	} while (input != ENTER);
 }
+void Create_Player_Menu(MasterPtr master, int numPlayers, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+{
+	string p = "CHARACTER SELECTION - PLAYER X";
+
+	for (int i = 0, playerNumber = 49; i < numPlayers; i++, playerNumber++)
+	{
+		KEYBOARD input = NONE;
+		unsigned int selected = 0;
+
+		p[27] = playerNumber;
+
+		do
+		{
+			CleanDrawingTable(*drawingTable);
+
+			InsertLineInDrawingTable(*drawingTable, 10, 3, p);
+
+			InsertSelectableText(("%s - %d, %d, %d, %d", master->cards.characterList->name,
+				master->cards.characterList->might, master->cards.characterList->speed,
+				master->cards.characterList->sanity, master->cards.characterList->inteligence),
+				35, 8, selected, 0, 38, 8, drawingTable);
+			InsertSelectableText(("%s - %d, %d, %d, %d", master->cards.characterList->next->name,
+				master->cards.characterList->next->might, master->cards.characterList->next->speed,
+				master->cards.characterList->next->sanity, master->cards.characterList->next->inteligence),
+				35, 10, selected, 1, 38, 10, drawingTable);
+			InsertSelectableText(("%s - %d, %d, %d, %d", master->cards.characterList->next->next->name,
+				master->cards.characterList->next->next->might, master->cards.characterList->next->next->speed,
+				master->cards.characterList->next->next->sanity, master->cards.characterList->next->next->inteligence),
+				35, 12, selected, 2, 38, 12, drawingTable);
+			
+
+			DrawMap(*drawingTable);
+
+			input = ReadInput();
+
+			if (input == DOWN_ARROW && selected < 4)
+				selected++;
+			else if (input == UP_ARROW && selected > 0)
+				selected--;
+			else if (input == ENTER)
+			{
+				switch (selected)
+				{
+				case 0:
+					Create_Player_Menu(master, 3, drawingTable);
+					break;
+				case 1:
+					Create_Player_Menu(master, 4, drawingTable);
+					break;
+				case 2:
+					Create_Player_Menu(master, 5, drawingTable);
+					break;
+				case 3:
+					Create_Player_Menu(master, 6, drawingTable);
+					break;
+				default:
+					break;
+				}
+			}
+		} while (!((input == ENTER) && (selected == 4)));
+
+	}
+}
+void Start(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+{
+	KEYBOARD input = NONE;
+	unsigned int selected = 0;
+
+	do
+	{
+		CleanDrawingTable(*drawingTable);
+
+		InsertLineInDrawingTable(*drawingTable, 10, 3, "SELECT THE NUMBER OF PLAYERS");
+
+		InsertSelectableText("THREE", 35, 8, selected, 0, 38, 8, drawingTable);
+		InsertSelectableText("FOUR", 35, 10, selected, 1, 38, 10, drawingTable);
+		InsertSelectableText("FIVE", 35, 12, selected, 2, 38, 12, drawingTable);
+		InsertSelectableText("SIX", 35, 14, selected, 3, 38, 14, drawingTable);
+		InsertSelectableText("BACK", 35, 16, selected, 4, 38, 16, drawingTable);
+
+		DrawMap(*drawingTable);
+
+		input = ReadInput();
+
+		if (input == DOWN_ARROW && selected < 4)
+			selected++;
+		else if (input == UP_ARROW && selected > 0)
+			selected--;
+		else if (input == ENTER)
+		{
+			switch (selected)
+			{
+			case 0:
+				Create_Player_Menu(master, 3, drawingTable);
+				break;
+			case 1:
+				Create_Player_Menu(master, 4, drawingTable);
+				break;
+			case 2:
+				Create_Player_Menu(master, 5, drawingTable);
+				break;
+			case 3:
+				Create_Player_Menu(master, 6, drawingTable);
+				break;
+			default:
+				break;
+			}
+		}
+	} while (!((input == ENTER) && (selected == 4)));
+}
 void Credits(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	KEYBOARD input = NONE;
@@ -670,8 +780,8 @@ void Credits(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 		InsertLineInDrawingTable(*drawingTable, 10, 3, "CREDITS");
 
 		InsertLineInDrawingTable(*drawingTable, 35, 14, "PROGRAMMED BY:");
-		InsertLineInDrawingTable(*drawingTable, 35, 16, "DIOGO PORTELA");
-		InsertLineInDrawingTable(*drawingTable, 35, 18, "PEDRO SILVA");
+		InsertLineInDrawingTable(*drawingTable, 35, 16, "DIOGO PORTELA - EMAIL@GMAIL.COM");
+		InsertLineInDrawingTable(*drawingTable, 35, 18, "PEDRO SILVA - PMIGUELFS@GMAIL.COM");
 
 		InsertLineInDrawingTable(*drawingTable, 40, 20, "BACK");
 
@@ -746,8 +856,9 @@ void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	unsigned int selected = 0;
 
 	CleanDrawingTable(*drawingTable);
+	textcolor(2);
 	InsertLineInDrawingTable(*drawingTable, 40, 14, "WELCOME TO BETRAYAL AT HOUSE ON THE HILL");
-
+	textcolor(0);
 	DrawMap(*drawingTable);
 
 	InputBreak();
@@ -775,6 +886,7 @@ void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 			switch (selected)
 			{
 			case 0:
+				Start(master, drawingTable);
 				break;
 			case 1:
 				Options(master, drawingTable);
