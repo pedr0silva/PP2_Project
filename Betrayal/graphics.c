@@ -9,7 +9,7 @@
 BOOL AsignPlayer(MasterPtr *master, int playerNumber, CharacterPtr selectedChar)
 {
 	CharacterPtr aux = (*master)->characterList;
-	if (aux == NULL)
+	if (aux == NULL || selectedChar == NULL)
 		return FALSE;
 	else
 		if (aux->next == NULL)
@@ -21,8 +21,8 @@ BOOL AsignPlayer(MasterPtr *master, int playerNumber, CharacterPtr selectedChar)
 		else
 			AsignPlayer(master, playerNumber, selectedChar);
 }
-#pragma endregion
 
+#pragma endregion
 
 BOOL ShowConsoleCursor(BOOL showFlag)
 {
@@ -310,18 +310,32 @@ int DrawArray(MasterPtr master, string type, char(*drawingTable)[MAX_HEIGHT][MAX
 }
 int DrawRoom(RoomPtr room, CameraPtr camera)
 {
+	Vector2 screenPos;
+	screenPos.x = camera->MinBound.x - room->position.x;
+	screenPos.y = camera->MinBound.y - room->position.y;
+
+	string aux;
+
 	if (strcmp(room->name, "MAIN ROOM" == 0))
 	{
-
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y,   "##########");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#  ----  #");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#   --   #");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "###    ###");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "###    ###");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "          ");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "###    ###");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "###    ###");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "          ");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#+#....#+#");
 	}
 	else
 	{
-		Vector2 screenPos;
-		screenPos.x = camera->MinBound.x - room->position.x;
-		screenPos.y = camera->MinBound.y - room->position.y;
-
-		string aux;
-
 		if (room->wall[0].WallType == DOOR)
 			strcpy(aux, "## ##");
 		if (room->wall[0].WallType == EMPTY)
@@ -613,6 +627,7 @@ void Manage_Data_Menu(MasterPtr master, string type, char(*drawingTable)[MAX_HEI
 		CleanDrawingTable(*drawingTable);
 
 		InsertLineInDrawingTable(*drawingTable, 10, 3, type);
+
 		InsertSelectableText("CREATE", 35, 16, selected, 0, 38, 16, drawingTable);
 		InsertSelectableText("EDIT", 35, 18, selected, 1, 38, 18, drawingTable);
 		InsertSelectableText("DELETE", 35, 20, selected, 2, 38, 20, drawingTable);
@@ -767,6 +782,62 @@ void Create_Player_Menu(MasterPtr master, int numPlayers, char(*drawingTable)[MA
 
 	}
 }
+void Manage_Cards_Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
+{
+	KEYBOARD input = NONE;
+	unsigned int selected = 0;
+
+	do
+	{
+		CleanDrawingTable(*drawingTable);
+
+		InsertLineInDrawingTable(*drawingTable, 10, 3, "CARDS");
+
+		InsertSelectableText("CHARACTERS", 35, 8, selected, 0, 38, 8, drawingTable);
+		InsertSelectableText("EVENTS", 35, 10, selected, 1, 38, 10, drawingTable);
+		InsertSelectableText("ITEMS", 35, 12, selected, 2, 38, 12, drawingTable);
+		InsertSelectableText("MINIONS", 35, 14, selected, 3, 38, 14, drawingTable);
+		InsertSelectableText("OMENS", 35, 16, selected, 4, 38, 16, drawingTable);
+		InsertSelectableText("ROOMS", 35, 18, selected, 5, 38, 18, drawingTable);
+		InsertSelectableText("BACK", 35, 20, selected, 7, 38, 20, drawingTable);
+
+		DrawMap(*drawingTable);
+
+		input = ReadInput();
+
+		if (input == DOWN_ARROW && selected < 6)
+			selected++;
+		else if (input == UP_ARROW && selected > 0)
+			selected--;
+		else if (input == ENTER)
+		{
+			switch (selected)
+			{
+			case 0:
+				Manage_Data_Menu(master, "CHARACTERS", drawingTable);
+				break;
+			case 1:
+				Manage_Data_Menu(master, "EVENTS", drawingTable);
+				break;
+			case 2:
+				Manage_Data_Menu(master, "ITEMS", drawingTable);
+				break;
+			case 3:
+				Manage_Data_Menu(master, "MINIONS", drawingTable);
+				break;
+			case 4:
+				Manage_Data_Menu(master, "OMENS", drawingTable);
+				break;
+			case 5:
+				Manage_Data_Menu(master, "ROOMS", drawingTable);
+				break;
+			default:
+				break;
+			}
+		}
+
+	} while (!((input == ENTER) && (selected == 6)));
+}
 void Start(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	KEYBOARD input = NONE;
@@ -798,15 +869,19 @@ void Start(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 			{
 			case 0:
 				Create_Player_Menu(master, 3, drawingTable);
+				GameLoop(master, drawingTable);
 				break;
 			case 1:
 				Create_Player_Menu(master, 4, drawingTable);
+				GameLoop(master, drawingTable);
 				break;
 			case 2:
 				Create_Player_Menu(master, 5, drawingTable);
+				GameLoop(master, drawingTable);
 				break;
 			case 3:
 				Create_Player_Menu(master, 6, drawingTable);
+				GameLoop(master, drawingTable);
 				break;
 			default:
 				break;
@@ -846,20 +921,17 @@ void Options(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 
 		InsertLineInDrawingTable(*drawingTable, 10, 3, "OPTIONS");
 
-		InsertSelectableText("CHARACTERS", 35, 8, selected, 0, 38, 8, drawingTable);
-		InsertSelectableText("EVENTS", 35, 10, selected, 1, 38, 10, drawingTable);
-		InsertSelectableText("ITEMS", 35, 12, selected, 2, 38, 12, drawingTable);
-		InsertSelectableText("MINIONS", 35, 14, selected, 3, 38, 14, drawingTable);
-		InsertSelectableText("OMENS", 35, 16, selected, 4, 38, 16, drawingTable);
-		InsertSelectableText("ROOMS", 35, 18, selected, 5, 38, 18, drawingTable);
-		InsertSelectableText("RESET", 35, 20, selected, 6, 38, 20, drawingTable);
-		InsertSelectableText("BACK", 35, 22, selected, 7, 38, 22, drawingTable);
+		InsertSelectableText("SAVE DATA", 35, 8, selected, 0, 38, 8, drawingTable);
+		InsertSelectableText("LOAD DATA", 35, 10, selected, 1, 38, 10, drawingTable);
+		InsertSelectableText("EDIT CURRENT DATA", 35, 12, selected, 6, 38, 12, drawingTable);
+		InsertSelectableText("RESET DATA", 35, 14, selected, 7, 38, 14, drawingTable);
+		InsertSelectableText("BACK", 35, 16, selected, 7, 38, 16, drawingTable);
 
 		DrawMap(*drawingTable);
 
 		input = ReadInput();
 
-		if (input == DOWN_ARROW && selected < 7)
+		if (input == DOWN_ARROW && selected < 4)
 			selected++;
 		else if (input == UP_ARROW && selected > 0)
 			selected--;
@@ -868,31 +940,22 @@ void Options(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 			switch (selected)
 			{
 			case 0:
-				Manage_Data_Menu(master, "CHARACTERS", drawingTable);
+				
 				break;
 			case 1:
-				Manage_Data_Menu(master, "EVENTS", drawingTable);
 				break;
 			case 2:
-				Manage_Data_Menu(master, "ITEMS", drawingTable);
+				Manage_Cards_Menu(master, drawingTable);
 				break;
 			case 3:
-				Manage_Data_Menu(master, "MINIONS", drawingTable);
-				break;
-			case 4:
-				Manage_Data_Menu(master, "OMENS", drawingTable);
-				break;
-			case 5:
-				Manage_Data_Menu(master, "ROOMS", drawingTable);
-				break;
-			case 6:
 				Reset_Menu(master, drawingTable);
+				break;
 			default:
 				break;
 			}
 		}
 
-	} while (!((input == ENTER) && (selected == 7)));
+	} while (!((input == ENTER) && (selected == 4)));
 }
 void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
@@ -944,3 +1007,4 @@ void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	} while (!((input == ENTER) && (selected == 3)));
 	return 1;
 }
+

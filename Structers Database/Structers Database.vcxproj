@@ -22,6 +22,7 @@
     <ClCompile Include="functions.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Betrayal\Include\dirent.h" />
     <ClInclude Include="Structs.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

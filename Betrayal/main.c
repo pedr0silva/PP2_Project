@@ -28,7 +28,7 @@ int main(void)
 		printf("%s", "THERE HAS BEEN AN ERROR LOADING.\n");
 		InputBreak();
 	}
-	
+
 	Menu(&GameMaster, &DrawingTable);
 
 	BOOL exit = EndMaster(&GameMaster);

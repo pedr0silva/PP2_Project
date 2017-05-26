@@ -22,6 +22,7 @@ Date Log:
 */
 
 #include "Structs.h"
+#include "dirent.h"
 
 #pragma region Auxiliary Structs Functions
 	//Allocates memory for a Vector2 and gives value to its atributes.
@@ -1150,10 +1151,12 @@ unsigned int DiceRoll(int stat)
 		auxrooom = DestroyRoom(auxrooom);
 		return TRUE;
 	}
-	//Writes to the "cards.bin" file all the cards taht compose the game.
-	BOOL WriteCards(CardPtr c)
+	//Writes to the file all the cards that compose the game.
+	BOOL WriteCards(CardPtr c, string fileName)
 	{
-		FILE *f = fopen("cards.bin", "wb");
+		strcat(fileName, ".bin");
+
+		FILE *f = fopen(fileName, "wb");
 		if (f)
 		{
 			fwrite(c->characterList, sizeof(Character), MAX_CHARACTERS, f);
@@ -1174,10 +1177,12 @@ unsigned int DiceRoll(int stat)
 		}
 		return FALSE;
 	}
-	//Reads from the "cards.bin" file all the cards that compose the game.
-	BOOL LoadCards(CardPtr c)
+	//Reads from the file all the cards that compose the game.
+	BOOL LoadCards(CardPtr c, string fileName)
 	{
-		FILE *f = fopen("cards.bin", "rb");
+		strcat(fileName, ".bin");
+
+		FILE *f = fopen(fileName, "rb");
 		if (f)
 		{
 			fread(c->characterList, sizeof(Character), MAX_CHARACTERS, f);
@@ -1200,11 +1205,11 @@ unsigned int DiceRoll(int stat)
 		return FALSE;
 	}
 	//Loads the master item.
-	BOOL LoadMaster(MasterPtr master)
+	BOOL LoadMaster(MasterPtr master, string fileName)
 	{
 		master->omenTrack = 0;
 		master->characterList = NULL;
-		BOOL cards = LoadCards(&(master->cards));
+		BOOL cards = LoadCards(&(master->cards), fileName);
 		master->map = *CreateMap();
 
 		if (cards == TRUE)
@@ -1212,14 +1217,32 @@ unsigned int DiceRoll(int stat)
 		return FALSE;
 	}
 	//Unloads the master item.
-	BOOL EndMaster(MasterPtr master)
+	BOOL EndMaster(MasterPtr master, string fileName)
 	{
-		BOOL cards = WriteCards(&(master->cards));
+		BOOL cards = WriteCards(&(master->cards), fileName);
 		BOOL map = DestroyMap(&(master->map));
 		master->characterList = DestroyCharList(master->characterList);
 
 		if (cards == TRUE && map == TRUE)
 			return TRUE;
 		return FALSE;
+	}
+	//Reads File Directory
+	BOOL ReadSaveDirectory()
+	{
+		DIR *p;
+		struct dirent *pp;
+		p = opendir("C:\Users\Pedro\Desktop\dev\PP2_Project\Betrayal\save");
+
+		if (p != NULL)
+		{
+			while ((pp = readdir(p)) != NULL) {
+				int length = strlen(pp->d_name);
+				if (strncmp(pp->d_name + length - 4, ".bin", 4) == 0) {
+					puts(pp->d_name);
+				}
+			}
+			closedir(p);
+		}
 	}
 #pragma endregion

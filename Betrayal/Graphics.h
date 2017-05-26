@@ -31,3 +31,5 @@ struct camera
 	char viewPort[MAX_HEIGHT][MAX_WIDTH];
 };
 typedef struct camera Camera, *CameraPtr;
+
+int DrawRoom(RoomPtr room, CameraPtr camera);

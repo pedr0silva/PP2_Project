@@ -71,8 +71,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\darap\Desktop\IPCA\Projecto- PP2\PP2_Project\Betrayal\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\darap\Desktop\IPCA\Paradigmas\PP2_Project\Betrayal\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Pedro\Desktop\dev\PP2_Project\Betrayal\Include;C:\Users\darap\Desktop\IPCA\Projecto- PP2\PP2_Project\Betrayal\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Pedro\Desktop\dev\PP2_Project\Betrayal\Lib;C:\Users\darap\Desktop\IPCA\Paradigmas\PP2_Project\Betrayal\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
