@@ -118,17 +118,15 @@ BOOL InsertSelectableText(string text, int x, int y, int currentSelected, int mo
 BOOL InsertLineInDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH], int x, int y, string text)
 {
 	int lenght = strlen(text);
-	if (x > MAX_WIDTH || y > MAX_HEIGHT || x < 0 || y < 0)
+	if ( y > MAX_HEIGHT || y < 0)
 		return FALSE;
 	for (int i = 0; i < lenght; i++)
 	{
-		(*drawingTable)[y][x++] = text[i];
-		if (x > MAX_WIDTH)
+		if (x < MAX_WIDTH && x > 0)
 		{
-			x = 0;
-			y++;
+			(*drawingTable)[y][x] = text[i];
 		}
-
+		x++;
 	}
 	return TRUE;
 }
@@ -318,7 +316,7 @@ int DrawRoom(RoomPtr room, CameraPtr camera)
 
 	if (strcmp(room->name, "MAIN ROOM" == 0))
 	{
-		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y,   "##########");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "##########");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#  ----  #");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#   --   #");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
@@ -332,31 +330,43 @@ int DrawRoom(RoomPtr room, CameraPtr camera)
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "          ");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
-		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#+#....#+#");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y,   "#+#....#+#");
 	}
 	else
 	{
 		if (room->wall[0].WallType == DOOR)
 			strcpy(aux, "## ##");
-		if (room->wall[0].WallType == EMPTY)
+		else if (room->wall[0].WallType == EMPTY)
 			strcpy(aux, "#####");
-		if (room->wall[0].WallType == WINDOW)
+		else if (room->wall[0].WallType == WINDOW)
 			strcpy(aux, "##+##");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, aux);
 
 		strcpy(aux, "#   #");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, aux);
 
+		if (room->wall[1].WallType == DOOR)
+			strcpy(aux, "         ");
+		else if (room->wall[1].WallType == EMPTY)
+			strcpy(aux, "#        ");
+		else if (room->wall[1].WallType == WINDOW)
+			strcpy(aux, "+        ");
+		if (room->wall[3].WallType == DOOR)
+			strcat(aux, " ");
+		else if (room->wall[3].WallType == EMPTY)
+			strcat(aux, "#");
+		else if (room->wall[3].WallType == WINDOW)
+			strcat(aux, "+");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y, aux);
 
-		screenPos.y++;
 		strcpy(aux, "#   #");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, aux);
-		screenPos.y++;
+
 		if (room->wall[2].WallType == DOOR)
 			strcpy(aux, "## ##");
-		if (room->wall[2].WallType == EMPTY)
+		else if (room->wall[2].WallType == EMPTY)
 			strcpy(aux, "#####");
-		if (room->wall[2].WallType == WINDOW)
+		else if (room->wall[2].WallType == WINDOW)
 			strcpy(aux, "##+##");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y, aux);
 	}
@@ -921,11 +931,11 @@ void Options(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 
 		InsertLineInDrawingTable(*drawingTable, 10, 3, "OPTIONS");
 
-		InsertSelectableText("SAVE DATA", 35, 8, selected, 0, 38, 8, drawingTable);
-		InsertSelectableText("LOAD DATA", 35, 10, selected, 1, 38, 10, drawingTable);
-		InsertSelectableText("EDIT CURRENT DATA", 35, 12, selected, 2, 38, 12, drawingTable);
-		InsertSelectableText("RESET DATA", 35, 14, selected, 3, 38, 14, drawingTable);
-		InsertSelectableText("BACK", 35, 16, selected, 4, 38, 16, drawingTable);
+		InsertSelectableText("SAVE DATA", 35, 14, selected, 0, 38, 14, drawingTable);
+		InsertSelectableText("LOAD DATA", 35, 16, selected, 1, 38, 16, drawingTable);
+		InsertSelectableText("EDIT CURRENT DATA", 35, 18, selected, 2, 38, 18, drawingTable);
+		InsertSelectableText("RESET DATA", 35, 20, selected, 3, 38, 20, drawingTable);
+		InsertSelectableText("BACK", 35, 22, selected, 4, 38, 22, drawingTable);
 
 		DrawMap(*drawingTable);
 
@@ -1007,4 +1017,3 @@ void Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	} while (!((input == ENTER) && (selected == 3)));
 	return 1;
 }
-
