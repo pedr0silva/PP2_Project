@@ -923,9 +923,9 @@ void Options(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 
 		InsertSelectableText("SAVE DATA", 35, 8, selected, 0, 38, 8, drawingTable);
 		InsertSelectableText("LOAD DATA", 35, 10, selected, 1, 38, 10, drawingTable);
-		InsertSelectableText("EDIT CURRENT DATA", 35, 12, selected, 6, 38, 12, drawingTable);
-		InsertSelectableText("RESET DATA", 35, 14, selected, 7, 38, 14, drawingTable);
-		InsertSelectableText("BACK", 35, 16, selected, 7, 38, 16, drawingTable);
+		InsertSelectableText("EDIT CURRENT DATA", 35, 12, selected, 2, 38, 12, drawingTable);
+		InsertSelectableText("RESET DATA", 35, 14, selected, 3, 38, 14, drawingTable);
+		InsertSelectableText("BACK", 35, 16, selected, 4, 38, 16, drawingTable);
 
 		DrawMap(*drawingTable);
 
