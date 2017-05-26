@@ -122,7 +122,7 @@ BOOL InsertLineInDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH], int x,
 		return FALSE;
 	for (int i = 0; i < lenght; i++)
 	{
-		if (x < MAX_WIDTH && x > 0)
+		if (x < MAX_WIDTH && x >= 0)
 		{
 			(*drawingTable)[y][x] = text[i];
 		}
