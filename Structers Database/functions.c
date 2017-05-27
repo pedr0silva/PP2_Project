@@ -1154,11 +1154,9 @@ unsigned int DiceRoll(int stat)
 	//Writes to the file all the cards that compose the game.
 	BOOL WriteCards(CardPtr c, string fileName)
 	{
-		string aux = "save/";
 		strcat(fileName, ".bin");
-		strcat(aux, fileName);
 
-		FILE *f = fopen(aux, "wb");
+		FILE *f = fopen(fileName, "wb");
 		if (f)
 		{
 			fwrite(c->characterList, sizeof(Character), MAX_CHARACTERS, f);
@@ -1182,11 +1180,9 @@ unsigned int DiceRoll(int stat)
 	//Reads from the file all the cards that compose the game.
 	BOOL LoadCards(CardPtr c, string fileName)
 	{
-		string aux = "save/";
 		strcat(fileName, ".bin");
-		strcat(aux, fileName);
 
-		FILE *f = fopen(aux, "rb");
+		FILE *f = fopen(fileName, "rb");
 		if (f)
 		{
 			fread(c->characterList, sizeof(Character), MAX_CHARACTERS, f);
