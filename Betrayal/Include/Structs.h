@@ -61,6 +61,10 @@ Date Log:
 		#ifndef ROOM_SIZE
 		#define ROOM_SIZE 1
 		#endif // ROOM_SIZE
+		#ifndef MAX_SAVES
+		#define MAX_SAVES 3
+		#endif // !MAX_SAVES
+
 
 	#pragma endregion
 	#pragma region AUXILIARY STRUCTS
@@ -276,8 +280,9 @@ Date Log:
 	#pragma endregion
 	#pragma region DATABASE
 		__declspec(dllexport) BOOL Reset(MasterPtr master);
-		__declspec(dllexport) BOOL LoadMaster(MasterPtr master);
-		__declspec(dllexport) BOOL EndMaster(MasterPtr master);
+		__declspec(dllexport) BOOL LoadMaster(MasterPtr master, string fileName);
+		__declspec(dllexport) BOOL EndMaster(MasterPtr master, string fileName);
+		__declspec(dllexport) string* ReadSaveDirectory();
 	#pragma endregion
 #pragma endregion
 

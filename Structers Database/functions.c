@@ -1154,9 +1154,11 @@ unsigned int DiceRoll(int stat)
 	//Writes to the file all the cards that compose the game.
 	BOOL WriteCards(CardPtr c, string fileName)
 	{
+		string aux = "save/";
 		strcat(fileName, ".bin");
+		strcat(aux, fileName);
 
-		FILE *f = fopen(fileName, "wb");
+		FILE *f = fopen(aux, "wb");
 		if (f)
 		{
 			fwrite(c->characterList, sizeof(Character), MAX_CHARACTERS, f);
@@ -1180,9 +1182,11 @@ unsigned int DiceRoll(int stat)
 	//Reads from the file all the cards that compose the game.
 	BOOL LoadCards(CardPtr c, string fileName)
 	{
+		string aux = "save/";
 		strcat(fileName, ".bin");
+		strcat(aux, fileName);
 
-		FILE *f = fopen(fileName, "rb");
+		FILE *f = fopen(aux, "rb");
 		if (f)
 		{
 			fread(c->characterList, sizeof(Character), MAX_CHARACTERS, f);
@@ -1228,21 +1232,27 @@ unsigned int DiceRoll(int stat)
 		return FALSE;
 	}
 	//Reads File Directory
-	BOOL ReadSaveDirectory()
+	string* ReadSaveDirectory()
 	{
-		DIR *p;
+		DIR *dir;
 		struct dirent *pp;
-		p = opendir("C:\Users\Pedro\Desktop\dev\PP2_Project\Betrayal\save");
+		string databases[MAX_SAVES];
+		int i = 0, length;
+		dir = opendir("C:\Users\Pedro\Desktop\dev\PP2_Project\Betrayal\save");
 
-		if (p != NULL)
+		if (dir != NULL)
 		{
-			while ((pp = readdir(p)) != NULL) {
-				int length = strlen(pp->d_name);
-				if (strncmp(pp->d_name + length - 4, ".bin", 4) == 0) {
-					puts(pp->d_name);
+			while ((pp = readdir(dir)) != NULL) 
+			{
+				length = strlen(pp->d_name);
+				if (strncmp(pp->d_name + length - 4, ".bin", 4) == 0) 
+				{
+					*databases[i] = pp->d_name;
+					i++;
 				}
 			}
-			closedir(p);
+			closedir(dir);
 		}
+		return databases;
 	}
 #pragma endregion

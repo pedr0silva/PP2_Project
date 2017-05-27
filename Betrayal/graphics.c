@@ -412,6 +412,9 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	while (stopGame)
 	{
 		DrawMap(drawingTable);
+		CameraPtr cam;
+		*cam = InitCamera(0, 0);
+		DrawRoom(master->cards.roomList, cam);
 		input = ReadInput();
 	}
 }

@@ -22,7 +22,7 @@ int main(void)
 	Master GameMaster;
 	char DrawingTable[MAX_HEIGHT][MAX_WIDTH];
 
-	BOOL start = LoadMaster(&GameMaster);
+	BOOL start = LoadMaster(&GameMaster, "cards");
 	if (start == FALSE)
 	{
 		printf("%s", "THERE HAS BEEN AN ERROR LOADING.\n");
@@ -31,7 +31,7 @@ int main(void)
 
 	Menu(&GameMaster, &DrawingTable);
 
-	BOOL exit = EndMaster(&GameMaster);
+	BOOL exit = EndMaster(&GameMaster, "default");
 	if (exit == FALSE)
 	{
 		printf("%s", "THERE HAS BEEN AN ERROR SAVING.\n");
