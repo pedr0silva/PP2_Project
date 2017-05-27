@@ -1154,7 +1154,7 @@ unsigned int DiceRoll(int stat)
 	//Writes to the file all the cards that compose the game.
 	BOOL WriteCards(CardPtr c, string fileName)
 	{
-		strcat(fileName, ".bin");
+		//strcat(fileName, ".bin");
 
 		FILE *f = fopen(fileName, "wb");
 		if (f)

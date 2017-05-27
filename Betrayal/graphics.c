@@ -6,20 +6,11 @@
 #pragma region FUNCOES A PASSAR PARA A DLL
 
 //Asigns a character to a player
-BOOL AsignPlayer(MasterPtr *master, int playerNumber, CharacterPtr selectedChar)
+BOOL AssignPlayer(MasterPtr master, int playerNumber, CharacterPtr selectedChar)
 {
-	CharacterPtr aux = (*master)->characterList;
-	if (aux == NULL || selectedChar == NULL)
-		return FALSE;
-	else
-		if (aux->next == NULL)
-		{
-			selectedChar->playerNumber = playerNumber;
-			aux->next = selectedChar;
-			return TRUE;
-		}
-		else
-			AsignPlayer(master, playerNumber, selectedChar);
+	selectedChar->playerNumber = selectedChar;
+	AddCharToList(master->characterList, selectedChar);
+	return TRUE;
 }
 
 #pragma endregion
@@ -118,7 +109,7 @@ BOOL InsertSelectableText(string text, int x, int y, int currentSelected, int mo
 BOOL InsertLineInDrawingTable(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH], int x, int y, string text)
 {
 	int lenght = strlen(text);
-	if ( y > MAX_HEIGHT || y < 0)
+	if (y > MAX_HEIGHT || y < 0)
 		return FALSE;
 	for (int i = 0; i < lenght; i++)
 	{
@@ -309,12 +300,12 @@ int DrawArray(MasterPtr master, string type, char(*drawingTable)[MAX_HEIGHT][MAX
 int DrawRoom(RoomPtr room, CameraPtr camera)
 {
 	Vector2 screenPos;
-	screenPos.x = camera->MinBound.x - room->position.x;
-	screenPos.y = camera->MinBound.y - room->position.y;
+	screenPos.x = room->position.x - camera->MinBound.x;
+	screenPos.y = room->position.y - camera->MinBound.y;
 
 	string aux;
 
-	if (strcmp(room->name, "MAIN ROOM" == 0))
+	if (strcmp(room->name, "MAIN ROOM") == 0)
 	{
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "##########");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#  ----  #");
@@ -330,7 +321,7 @@ int DrawRoom(RoomPtr room, CameraPtr camera)
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "          ");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
-		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y,   "#+#....#+#");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y, "#+#....#+#");
 	}
 	else
 	{
@@ -409,12 +400,11 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	int stopGame = 1;
 	KEYBOARD input = NONE;
+	Camera cam = InitCamera(-((MAX_WIDTH / 2) - (ROOM_SIZE)), -((MAX_HEIGHT / 2) - (ROOM_SIZE * 3/ 2)));
 	while (stopGame)
 	{
-		DrawMap(drawingTable);
-		CameraPtr cam;
-		*cam = InitCamera(0, 0);
-		DrawRoom(master->cards.roomList, cam);
+		DrawRoom(&(master->cards.roomList[0]), &cam);
+		DrawMap(&(cam.viewPort));
 		input = ReadInput();
 	}
 }
@@ -713,13 +703,15 @@ void Create_Player_Menu(MasterPtr master, int numPlayers, char(*drawingTable)[MA
 {
 	string p = "CHARACTER SELECTION - PLAYER X";
 	CharacterPtr aux = master->cards.characterList;
+	string auxStr;
+	KEYBOARD input = NONE;
 
 	for (int playerNumber = 0, ASCIIconversion = 49; playerNumber < numPlayers; ASCIIconversion++, playerNumber++)
 	{
-		KEYBOARD input = NONE;
+
 		unsigned int selected = 0;
 
-		p[27] = ASCIIconversion;
+		p[29] = ASCIIconversion;
 
 		do
 		{
@@ -727,12 +719,12 @@ void Create_Player_Menu(MasterPtr master, int numPlayers, char(*drawingTable)[MA
 
 			InsertLineInDrawingTable(*drawingTable, 10, 3, p);
 
-			for (int j = 0, y = 8; j < MAX_CHARACTERS; j++, y+2)  //terá espaco no ecra para tudo?
+			for (int j = 0, y = 8; j < numPlayers; j++, y += 2)  //terá espaco no ecra para tudo?
 			{
+				aux = &(master->cards.characterList[j]);
+				sprintf(auxStr, "%s - %d, %d, %d, %d", aux->name, aux->might, aux->speed, aux->sanity, aux->inteligence);
 				//deviamos eliminar ou arrajar outra forma de destacar os characters ja escolhidos.
-				InsertSelectableText(("%s - %d, %d, %d, %d", aux->name, aux->might, aux->speed,	aux->sanity, aux->inteligence),
-					35, y, selected, j, 38, y, drawingTable);
-				aux = aux->next;
+				InsertSelectableText(auxStr, 35, y, selected, j, 38, y, drawingTable);
 			}
 
 			//1 linha para o back
@@ -747,51 +739,9 @@ void Create_Player_Menu(MasterPtr master, int numPlayers, char(*drawingTable)[MA
 				selected--;
 			else if (input == ENTER)
 			{
-				aux = master->cards.characterList; //voltar ao inicio
-
-				switch (selected)
-				{
-				case 0:
-					AsignPlayer(master, playerNumber, aux);
-					break;
-				case 1:
-					AsignPlayer(master, playerNumber, aux->next);
-					break;
-				case 2:
-					AsignPlayer(master, playerNumber, aux->next->next);
-					break;
-				case 3:
-					AsignPlayer(master, playerNumber, aux->next->next->next);
-					break;
-				case 4:
-					AsignPlayer(master, playerNumber, aux->next->next->next->next);
-					break;
-				case 5:
-					AsignPlayer(master, playerNumber, aux->next->next->next->next->next);
-					break;
-				case 6:
-					AsignPlayer(master, playerNumber, aux->next->next->next->next->next->next);
-					break;
-				case 7:
-					AsignPlayer(master, playerNumber, aux->next->next->next->next->next->next->next);
-					break;
-				case 8:
-					AsignPlayer(master, playerNumber, aux->next->next->next->next->next->next->next->next);
-					break;
-				case 9:
-					AsignPlayer(master, playerNumber, aux->next->next->next->next->next->next->next->next->next);
-					break;
-				case 10:
-					AsignPlayer(master, playerNumber, aux->next->next->next->next->next->next->next->next->next->next);
-					break;
-				case 11:
-					AsignPlayer(master, playerNumber, aux->next->next->next->next->next->next->next->next->next->next->next);
-					break;
-				default:
-					break;
-				}
+				AssignPlayer(master, playerNumber, &(master->cards.characterList[selected]));
 			}
-		} while (!((input == ENTER) && (selected == 12)));
+		} while ((input != ENTER));
 
 	}
 }
@@ -812,7 +762,7 @@ void Manage_Cards_Menu(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WID
 		InsertSelectableText("MINIONS", 35, 14, selected, 3, 38, 14, drawingTable);
 		InsertSelectableText("OMENS", 35, 16, selected, 4, 38, 16, drawingTable);
 		InsertSelectableText("ROOMS", 35, 18, selected, 5, 38, 18, drawingTable);
-		InsertSelectableText("BACK", 35, 20, selected, 7, 38, 20, drawingTable);
+		InsertSelectableText("BACK", 35, 20, selected, 6, 38, 20, drawingTable);
 
 		DrawMap(*drawingTable);
 
@@ -953,7 +903,7 @@ void Options(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 			switch (selected)
 			{
 			case 0:
-				
+
 				break;
 			case 1:
 				break;

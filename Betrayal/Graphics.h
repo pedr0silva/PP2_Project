@@ -2,6 +2,7 @@
 
 #define MAX_HEIGHT 29
 #define MAX_WIDTH 120
+#define ROOM_SIZE 5
 
 typedef enum {
 	WALL_HORIZONTAL = '-',

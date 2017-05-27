@@ -18,11 +18,13 @@ int main(void)
 {
 	ShowConsoleCursor(FALSE);
 
+	string aux = "cards";
+
 	//Important variables.
 	Master GameMaster;
 	char DrawingTable[MAX_HEIGHT][MAX_WIDTH];
 
-	BOOL start = LoadMaster(&GameMaster, "cards");
+	BOOL start = LoadMaster(&GameMaster, aux);
 	if (start == FALSE)
 	{
 		printf("%s", "THERE HAS BEEN AN ERROR LOADING.\n");
@@ -31,7 +33,7 @@ int main(void)
 
 	Menu(&GameMaster, &DrawingTable);
 
-	BOOL exit = EndMaster(&GameMaster, "default");
+	BOOL exit = EndMaster(&GameMaster, aux);
 	if (exit == FALSE)
 	{
 		printf("%s", "THERE HAS BEEN AN ERROR SAVING.\n");
