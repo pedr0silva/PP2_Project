@@ -50,7 +50,7 @@ Date Log:
 		#define MAX_CHARACTERS 12
 		#endif // !MAX_CHARACTERS
 		#ifndef MAX_ROOMS
-		#define MAX_ROOMS 45
+		#define MAX_ROOMS 50
 		#endif // !MAX_ROOMS
 		#ifndef WALL_NUMBER
 		#define WALL_NUMBER 4
@@ -115,6 +115,7 @@ Date Log:
 		RoomWall wall[WALL_NUMBER];
 		EventPtr event;
 		OmenPtr omen;
+		BOOL isUsed;
 		struct Room *next;
 	};
 	typedef struct room Room, *RoomPtr;

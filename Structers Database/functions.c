@@ -204,6 +204,7 @@ Date Log:
 			aux->event = roomEvent;
 			aux->omen = roomOmen;
 			aux->next = NULL;
+			aux->isUsed = FALSE;
 			BOOL i = AssignWalls(&(aux->wall), upType, leftType, downType, rightType);
 		}
 		return aux;
@@ -218,6 +219,7 @@ Date Log:
 		aux->position = position;
 		aux->positionLenght = aux->position.x + aux->position.y;
 		aux->next = NULL;
+		room->isUsed = aux->isUsed =TRUE;
 		BOOL i = CopyWalls(aux->wall, room->wall);
 
 		if (i == TRUE)
@@ -316,6 +318,9 @@ Date Log:
 		RoomPtr aux = NULL;
 		int random = rand() % master->cards.roomCount;
 		aux = &(master->cards.roomList[random]);
+
+		if (aux->isUsed == TRUE)
+			aux = RandomRoom(master);
 		return aux;
 	}
 	//Opens a Room and generates one.
@@ -339,7 +344,6 @@ Date Log:
 				vectorAux.x += ROOM_SIZE;;
 
 			roomRandom = RandomRoom(master);
-
 			roomAux = InstanciateRoom(roomRandom, vectorAux);
 			floor->roomList = AddRoomToList(floor->roomList, roomAux);
 			return TRUE;

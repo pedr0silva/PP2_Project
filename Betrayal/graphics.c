@@ -305,23 +305,29 @@ int DrawRoom(RoomPtr room, CameraPtr camera)
 
 	string aux;
 
-	if (strcmp(room->name, "MAIN ROOM") == 0)
+	if (strcmp(room->name, "MAIN ROOM 1") == 0)
 	{
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "##########");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#  ----  #");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#   --   #");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
-		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "###    ###");
-		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "###    ###");
-		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
-		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "          ");
-		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
-		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "###    ###");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y, "###    ###");
+	}
+	else if (strcmp(room->name, "MAIN ROOM 2") == 0)
+	{
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "###    ###");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "          ");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
-		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y, "#+#....#+#");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y, "###    ###");
+	}
+	else if (strcmp(room->name, "MAIN ROOM 3") == 0)
+	{
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "###    ###");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "          ");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y,   "#+#....#+#");
 	}
 	else
 	{
@@ -401,9 +407,25 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	int stopGame = 1;
 	KEYBOARD input = NONE;
 	Camera cam = InitCamera(-((MAX_WIDTH / 2) - (ROOM_SIZE)), -((MAX_HEIGHT / 2) - (ROOM_SIZE * 3/ 2)));
+	
+	Vector2 auxVec = ChangeVector2(0, 0);
+	RoomPtr roomAux = InstanciateRoom(&(master->cards.roomList[0]), auxVec);
+	master->map.mapFloor->next->roomList = AddRoomToList(master->map.mapFloor->next->roomList, roomAux);
+	
+	auxVec = ChangeVector2(0, 0 + ROOM_SIZE);
+	roomAux = InstanciateRoom(&(master->cards.roomList[1]), auxVec);
+	master->map.mapFloor->next->roomList = AddRoomToList(master->map.mapFloor->next->roomList, roomAux);
+
+
+	auxVec = ChangeVector2(0, 0 + ROOM_SIZE * 2);
+	roomAux = InstanciateRoom(&(master->cards.roomList[2]), auxVec);
+	master->map.mapFloor->next->roomList = AddRoomToList(master->map.mapFloor->next->roomList, roomAux);
+
+	auxVec = ChangeVector2(0, 0);
+	UpdateMap(master->map.mapFloor->next, &cam, auxVec);
+
 	while (stopGame)
 	{
-		DrawRoom(&(master->cards.roomList[0]), &cam);
 		DrawMap(&(cam.viewPort));
 		input = ReadInput();
 	}
