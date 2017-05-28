@@ -84,8 +84,16 @@ Date Log:
 				aux2 = aux;
 				aux = aux->next;
 			}
-			aux2->next = node;
-			node->next = aux;
+			if (aux == head)
+			{
+				node->next = aux->next;
+				aux->next = node;
+			}
+			else
+			{
+				node->next = aux;
+				aux2->next = node;
+			}
 		}
 		return head;
 	}
@@ -243,8 +251,16 @@ Date Log:
 				aux2 = aux;
 				aux = aux->next;
 			}
-			aux2->next = node;
-			node->next = aux;
+			if (aux == head)
+			{
+				node->next = aux->next;
+				aux->next = node;
+			}
+			else
+			{
+				node->next = aux;
+				aux2->next = node;
+			}			
 		}
 		return head;
 	}
@@ -337,11 +353,11 @@ Date Log:
 			if (direction == UP)
 				vectorAux.y += ROOM_SIZE;
 			else if (direction == LEFT)
-				vectorAux.x -= ROOM_SIZE;
+				vectorAux.x -= ROOM_SIZE * 2;
 			else if (direction == DOWN)
 				vectorAux.y -= ROOM_SIZE;
 			else if (direction == RIGHT)
-				vectorAux.x += ROOM_SIZE;;
+				vectorAux.x += ROOM_SIZE * 2;
 
 			roomRandom = RandomRoom(master);
 			roomAux = InstanciateRoom(roomRandom, vectorAux);
@@ -377,8 +393,16 @@ Date Log:
 				aux2 = aux;
 				aux = aux->next;
 			}
-			aux2->next = node;
-			node->next = aux;
+			if (aux == head)
+			{
+				node->next = aux->next;
+				aux->next = node;
+			}
+			else
+			{
+				node->next = aux;
+				aux2->next = node;
+			}
 		}
 		return head;
 	}
@@ -591,8 +615,16 @@ Date Log:
 					aux2 = aux;
 					aux = aux->next;
 				}
-				aux2->next = node;
-				node->next = aux;
+				if (aux == head)
+				{
+					node->next = aux->next;
+					aux->next = node;
+				}
+				else
+				{
+					node->next = aux;
+					aux2->next = node;
+				}
 			}
 			return head;
 		}
@@ -706,8 +738,16 @@ Date Log:
 					aux2 = aux;
 					aux = aux->next;
 				}
-				aux2->next = node;
-				node->next = aux;
+				if (aux == head)
+				{
+					node->next = aux->next;
+					aux->next = node;
+				}
+				else
+				{
+					node->next = aux;
+					aux2->next = node;
+				}
 			}
 			return head;
 		}
@@ -822,8 +862,16 @@ Date Log:
 					aux2 = aux;
 					aux = aux->next;
 				}
-				aux2->next = node;
-				node->next = aux;
+				if (aux == head)
+				{
+					node->next = aux->next;
+					aux->next = node;
+				}
+				else
+				{
+					node->next = aux;
+					aux2->next = node;
+				}
 			}
 			return head;
 		}
@@ -993,8 +1041,16 @@ Date Log:
 					aux2 = aux;
 					aux = aux->next;
 				}
-				aux2->next = node;
-				node->next = aux;
+				if (aux == head)
+				{
+					node->next = aux->next;
+					aux->next = node;
+				}
+				else
+				{
+					node->next = aux;
+					aux2->next = node;
+				}
 			}
 			return head;
 		}

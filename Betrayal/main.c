@@ -14,6 +14,7 @@ Date Log:
 
 #include "Graphics.h"
 #include "Include\Structs.h"
+
 int main(void)
 {
 	ShowConsoleCursor(FALSE);

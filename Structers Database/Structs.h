@@ -59,7 +59,7 @@ Date Log:
 		#define MAX_STRING 512
 		#endif // !MAX_STRING
 		#ifndef ROOM_SIZE
-		#define ROOM_SIZE 1
+		#define ROOM_SIZE 5
 		#endif // ROOM_SIZE
 		#ifndef MAX_SAVES
 		#define MAX_SAVES 3
@@ -116,7 +116,7 @@ Date Log:
 		EventPtr event;
 		OmenPtr omen;
 		BOOL isUsed;
-		struct Room *next;
+		struct room *next;
 	};
 	typedef struct room Room, *RoomPtr;
 	typedef enum { BASEMENT = -1, GROUND, UPPER } FloorLevel;

@@ -332,18 +332,18 @@ int DrawRoom(RoomPtr room, CameraPtr camera)
 	else
 	{
 		if (room->wall[0].WallType == DOOR)
-			strcpy(aux, "## ##");
+			strcpy(aux, "###    ###");
 		else if (room->wall[0].WallType == EMPTY)
-			strcpy(aux, "#####");
+			strcpy(aux, "##########");
 		else if (room->wall[0].WallType == WINDOW)
-			strcpy(aux, "##+##");
+			strcpy(aux, "####++####");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, aux);
 
-		strcpy(aux, "#   #");
+		strcpy(aux, "#        #");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, aux);
 
 		if (room->wall[1].WallType == DOOR)
-			strcpy(aux, "         ");
+			strcpy(aux, "          ");
 		else if (room->wall[1].WallType == EMPTY)
 			strcpy(aux, "#        ");
 		else if (room->wall[1].WallType == WINDOW)
@@ -354,17 +354,17 @@ int DrawRoom(RoomPtr room, CameraPtr camera)
 			strcat(aux, "#");
 		else if (room->wall[3].WallType == WINDOW)
 			strcat(aux, "+");
-		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y, aux);
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, aux);
 
-		strcpy(aux, "#   #");
+		strcpy(aux, "#        #");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, aux);
 
 		if (room->wall[2].WallType == DOOR)
-			strcpy(aux, "## ##");
+			strcpy(aux, "###    ###");
 		else if (room->wall[2].WallType == EMPTY)
-			strcpy(aux, "#####");
+			strcpy(aux, "##########");
 		else if (room->wall[2].WallType == WINDOW)
-			strcpy(aux, "##+##");
+			strcpy(aux, "####++####");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y, aux);
 	}
 	return 1;
@@ -407,7 +407,8 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	int stopGame = 1;
 	KEYBOARD input = NONE;
 	Camera cam = InitCamera(-((MAX_WIDTH / 2) - (ROOM_SIZE)), -((MAX_HEIGHT / 2) - (ROOM_SIZE * 3/ 2)));
-	
+	CharacterPtr currentPlayer;
+
 	Vector2 auxVec = ChangeVector2(0, 0);
 	RoomPtr roomAux = InstanciateRoom(&(master->cards.roomList[0]), auxVec);
 	master->map.mapFloor->next->roomList = AddRoomToList(master->map.mapFloor->next->roomList, roomAux);
@@ -415,7 +416,6 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	auxVec = ChangeVector2(0, 0 + ROOM_SIZE);
 	roomAux = InstanciateRoom(&(master->cards.roomList[1]), auxVec);
 	master->map.mapFloor->next->roomList = AddRoomToList(master->map.mapFloor->next->roomList, roomAux);
-
 
 	auxVec = ChangeVector2(0, 0 + ROOM_SIZE * 2);
 	roomAux = InstanciateRoom(&(master->cards.roomList[2]), auxVec);
@@ -426,8 +426,13 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 
 	while (stopGame)
 	{
+		UpdateMap(master->map.mapFloor->next, &cam, auxVec);
 		DrawMap(&(cam.viewPort));
 		input = ReadInput();
+		if (input == LEFT_ARROW)
+		{
+			OpenRoom(master, master->map.mapFloor->next, roomAux, LEFT);
+		}
 	}
 }
 
