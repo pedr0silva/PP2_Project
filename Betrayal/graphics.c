@@ -8,8 +8,8 @@
 //Asigns a character to a player
 BOOL AssignPlayer(MasterPtr master, int playerNumber, CharacterPtr selectedChar)
 {
-	selectedChar->playerNumber = selectedChar;
-	AddCharToList(master->characterList, selectedChar);
+	selectedChar->playerNumber = playerNumber + 1;
+	master->characterList = AddCharToList(master->characterList, selectedChar);
 	return TRUE;
 }
 
@@ -429,9 +429,76 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 		UpdateMap(master->map.mapFloor->next, &cam, auxVec);
 		DrawMap(&(cam.viewPort));
 		input = ReadInput();
-		if (input == LEFT_ARROW)
+		RoomPtr auxRoom = master->map.mapFloor->roomList;
+		CharacterPtr auxChar = master->characterList;
+
+		while (auxChar != NULL)
 		{
-			OpenRoom(master, master->map.mapFloor->next, roomAux, LEFT);
+			int auxMovement = auxChar->speed;
+			if (input == LEFT_ARROW)
+			{
+				while (auxRoom != NULL) //percorre todos os rooms da lista
+				{
+					//se existe 1 room posicionado a esquerda
+					if (auxRoom->position.x == auxChar->room->position.x - ROOM_SIZE * 2)
+					{
+						//se o player ainda se pode movimentar subtrai 1 movement
+						if (auxMovement != 0)
+							auxMovement--;
+						//caso contrario acaba a iteracao do player actual
+						else
+							break;
+					}
+					auxRoom = auxRoom->next;
+				}
+					//se nao existe nenhum room posicionado esse lugar, entao abre um.
+					OpenRoom(master, master->map.mapFloor->next, roomAux, LEFT);
+			}
+			if (input == RIGHT_ARROW)
+			{
+				while (auxRoom != NULL)
+				{
+					if (auxRoom->position.x == auxChar->room->position.x + ROOM_SIZE * 2)
+					{
+						if (auxMovement != 0)
+							auxMovement--;
+						else
+							break;
+					}
+					auxRoom = auxRoom->next;
+				}
+				OpenRoom(master, master->map.mapFloor->next, roomAux, RIGHT);
+			}
+			if (input == UP_ARROW)
+			{
+				while (auxRoom != NULL)
+				{
+					if (auxRoom->position.y == auxChar->room->position.y - ROOM_SIZE)
+					{
+						if (auxMovement != 0)
+							auxMovement--;
+						else
+							break;
+					}
+					auxRoom = auxRoom->next;
+				}
+				OpenRoom(master, master->map.mapFloor->next, roomAux, UP);
+			}
+			if (input == DOWN_ARROW)
+			{
+				while (auxRoom != NULL)
+				{
+					if (auxRoom->position.y == auxChar->room->position.y + ROOM_SIZE)
+					{
+						if (auxMovement != 0)
+							auxMovement--;
+						else
+							break;
+					}
+					auxRoom = auxRoom->next;
+				}
+			}
+			auxChar = auxChar->next;
 		}
 	}
 }
