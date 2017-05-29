@@ -426,11 +426,12 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 
 	while (stopGame)
 	{
-		UpdateMap(master->map.mapFloor->next, &cam, auxVec);
-		DrawMap(&(cam.viewPort));
+		//UpdateMap(master->map.mapFloor->next, &cam, auxVec);
+		//DrawMap(&(cam.viewPort));
 		input = ReadInput();
 		RoomPtr auxRoom = master->map.mapFloor->roomList;
 		CharacterPtr auxChar = master->characterList;
+		BOOL roomExists = FALSE;
 
 		while (auxChar != NULL)
 		{
@@ -442,6 +443,7 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 					//se existe 1 room posicionado a esquerda
 					if (auxRoom->position.x == auxChar->room->position.x - ROOM_SIZE * 2)
 					{
+						roomExists = TRUE;
 						//se o player ainda se pode movimentar subtrai 1 movement
 						if (auxMovement != 0)
 							auxMovement--;
@@ -451,15 +453,21 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 					}
 					auxRoom = auxRoom->next;
 				}
+				if (!roomExists)
+				{
 					//se nao existe nenhum room posicionado esse lugar, entao abre um.
 					OpenRoom(master, master->map.mapFloor->next, roomAux, LEFT);
+					UpdateMap(master->map.mapFloor->next, &cam, auxVec);
+					DrawMap(&(cam.viewPort));
+				}
 			}
-			if (input == RIGHT_ARROW)
+			else if (input == RIGHT_ARROW)
 			{
 				while (auxRoom != NULL)
 				{
 					if (auxRoom->position.x == auxChar->room->position.x + ROOM_SIZE * 2)
 					{
+						roomExists = TRUE;
 						if (auxMovement != 0)
 							auxMovement--;
 						else
@@ -467,14 +475,20 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 					}
 					auxRoom = auxRoom->next;
 				}
-				OpenRoom(master, master->map.mapFloor->next, roomAux, RIGHT);
+				if (!roomExists)
+				{
+					OpenRoom(master, master->map.mapFloor->next, roomAux, RIGHT);
+					UpdateMap(master->map.mapFloor->next, &cam, auxVec);
+					DrawMap(&(cam.viewPort));
+				}
 			}
-			if (input == UP_ARROW)
+			else if (input == UP_ARROW)
 			{
 				while (auxRoom != NULL)
 				{
 					if (auxRoom->position.y == auxChar->room->position.y - ROOM_SIZE)
 					{
+						roomExists = TRUE;
 						if (auxMovement != 0)
 							auxMovement--;
 						else
@@ -482,14 +496,20 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 					}
 					auxRoom = auxRoom->next;
 				}
-				OpenRoom(master, master->map.mapFloor->next, roomAux, UP);
+				if (!roomExists)
+				{
+					OpenRoom(master, master->map.mapFloor->next, roomAux, UP);
+					UpdateMap(master->map.mapFloor->next, &cam, auxVec);
+					DrawMap(&(cam.viewPort));
+				}
 			}
-			if (input == DOWN_ARROW)
+			else if (input == DOWN_ARROW)
 			{
 				while (auxRoom != NULL)
 				{
 					if (auxRoom->position.y == auxChar->room->position.y + ROOM_SIZE)
 					{
+						roomExists = TRUE;
 						if (auxMovement != 0)
 							auxMovement--;
 						else
@@ -497,6 +517,13 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 					}
 					auxRoom = auxRoom->next;
 				}
+				if (!roomExists)
+				{
+					OpenRoom(master, master->map.mapFloor->next, roomAux, DOWN);
+					UpdateMap(master->map.mapFloor->next, &cam, auxVec);
+					DrawMap(&(cam.viewPort));
+				}
+
 			}
 			auxChar = auxChar->next;
 		}
