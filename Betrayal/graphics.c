@@ -8,8 +8,9 @@
 //Asigns a character to a player
 BOOL AssignPlayer(MasterPtr master, int playerNumber, CharacterPtr selectedChar)
 {
-	selectedChar->playerNumber = playerNumber + 1;
-	master->characterList = AddCharToList(master->characterList, selectedChar);
+	Vector2 auxVec = ChangeVector2(0, 0);
+	CharacterPtr charAux = InstanciateChar(selectedChar, master->map.mapFloor->next->roomList, playerNumber + 1);
+	master->characterList = AddCharToList(master->characterList, charAux);
 
 	return TRUE;
 }
