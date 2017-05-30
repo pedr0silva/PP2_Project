@@ -332,7 +332,7 @@ Date Log:
 	RoomPtr RandomRoom(MasterPtr master)
 	{
 		RoomPtr aux = NULL;
-		int random = rand() % master->cards.roomCount + 1;
+		int random = rand() % master->cards.roomCount;
 		aux = &(master->cards.roomList[random]);
 
 		if (aux->isUsed == TRUE)
@@ -340,7 +340,7 @@ Date Log:
 		return aux;
 	}
 	//Opens a Room and generates one.
-	BOOL OpenRoom(MasterPtr master, FloorPtr floor, RoomPtr currentRoom, Direction direction)
+	RoomPtr OpenRoom(MasterPtr master, FloorPtr floor, RoomPtr currentRoom, Direction direction)
 	{
 		RoomWallPtr wallAux = FindWallDirection(currentRoom, direction);
 		RoomPtr roomAux = NULL;
@@ -351,30 +351,19 @@ Date Log:
 		{
 			vectorAux = currentRoom->position;
 			if (direction == UP)
-				vectorAux.y += ROOM_SIZE;
+				vectorAux.y -= ROOM_SIZE;
 			else if (direction == LEFT)
 				vectorAux.x -= ROOM_SIZE * 2;
 			else if (direction == DOWN)
-				vectorAux.y -= ROOM_SIZE;
+				vectorAux.y += ROOM_SIZE;
 			else if (direction == RIGHT)
 				vectorAux.x += ROOM_SIZE * 2;
 
 			roomRandom = RandomRoom(master);
 			roomAux = InstanciateRoom(roomRandom, vectorAux);
 			floor->roomList = AddRoomToList(floor->roomList, roomAux);
-			return TRUE;
 		}
-		else
-			return FALSE;
-	}
-	//returns de last room in the list
-	RoomPtr LastRoom(RoomPtr head)
-	{
-		RoomPtr aux = head;
-
-		while (aux->next != NULL)
-			aux = aux->next;
-		return aux;
+		return roomAux;
 	}
 #pragma endregion
 
@@ -1029,6 +1018,7 @@ Date Log:
 			aux->minions = NULL;
 			aux->items = NULL;
 			aux->room = NULL;
+			aux->currentFloor = NULL;
 			aux->next = NULL;
 			if (name != NULL)
 				strcpy(aux->name, strupr(name));
@@ -1045,7 +1035,7 @@ Date Log:
 				head = node;
 			else
 			{
-				while (aux && strcmp(aux->name, node->name) > 0)
+				while (aux && aux->playerNumber > node->playerNumber)
 				{
 					aux2 = aux;
 					aux = aux->next;
@@ -1073,7 +1063,8 @@ Date Log:
 			}
 			return FALSE;
 		}
-		CharacterPtr InstanciateChar(CharacterPtr character, RoomPtr startingRoom, Vector2 position, int playerNumber)
+		//Creates a copy of a character to use in a game.
+		CharacterPtr InstanciateChar(CharacterPtr character, RoomPtr startingRoom, FloorPtr currentFloor, Vector2 position, int playerNumber)
 		{
 			CharacterPtr aux = (CharacterPtr)malloc(sizeof(Character));
 			aux->inteligence = character->inteligence;
@@ -1082,6 +1073,7 @@ Date Log:
 			aux->sanity = character->sanity;
 			aux->items = character->items;
 			aux->room = startingRoom;
+			aux->currentFloor = currentFloor;
 			aux->position = position;
 			aux->minions = NULL;
 			strcpy(aux->name, character->name);

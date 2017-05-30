@@ -19,11 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="functions.c" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\Betrayal\Include\dirent.h" />
     <ClInclude Include="Structs.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="functions.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B3BD6D3C-A189-442E-BE57-0D783EAB73FF}</ProjectGuid>

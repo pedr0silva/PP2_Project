@@ -168,6 +168,7 @@ Date Log:
 		int playerNumber;
 		Vector2 position;
 		RoomPtr room;
+		FloorPtr currentFloor;
 		MinionPtr minions;
 		ItemPtr items;
 		HistoryPtr history;
@@ -223,7 +224,7 @@ Date Log:
 		__declspec(dllexport) RoomPtr DestroyRoom(RoomPtr room);
 		__declspec(dllexport) RoomPtr DestroyRoomList(RoomPtr head);
 		__declspec(dllexport) RoomPtr RandomRoom(MasterPtr master);
-		__declspec(dllexport) BOOL OpenRoom(MasterPtr master, FloorPtr floor, RoomPtr currentRoom, Direction direction);
+		__declspec(dllexport) RoomPtr OpenRoom(MasterPtr master, FloorPtr floor, RoomPtr currentRoom, Direction direction);
 
 		__declspec(dllexport) FloorPtr CreateFloor(FloorLevel level);
 		__declspec(dllexport) FloorPtr AddFloorToList(FloorPtr head, FloorPtr node);
@@ -270,7 +271,7 @@ Date Log:
 		__declspec(dllexport) CharacterPtr CreateChar(string name, int might, int speed, int sanity, int inteligence);
 		__declspec(dllexport) CharacterPtr AddCharToList(CharacterPtr head, CharacterPtr node);
 		__declspec(dllexport) BOOL AddCharToArray(MasterPtr master, CharacterPtr node);
-		__declspec(dllexport) CharacterPtr InstanciateChar(CharacterPtr character, RoomPtr startingRoom, Vector2 position, int playerNumber);
+		__declspec(dllexport) CharacterPtr InstanciateChar(CharacterPtr character, RoomPtr startingRoom, FloorPtr currentFloor, Vector2 position, int playerNumber);
 		__declspec(dllexport) BOOL RemoveCharFromArray(MasterPtr master, string node);
 		__declspec(dllexport) CharacterPtr RemoveCharFromList(CharacterPtr head, string name);
 		__declspec(dllexport) CharacterPtr DestroyChar(CharacterPtr node);
