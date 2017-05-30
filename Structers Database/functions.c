@@ -332,7 +332,7 @@ Date Log:
 	RoomPtr RandomRoom(MasterPtr master)
 	{
 		RoomPtr aux = NULL;
-		int random = rand() % master->cards.roomCount;
+		int random = rand() % master->cards.roomCount + 1;
 		aux = &(master->cards.roomList[random]);
 
 		if (aux->isUsed == TRUE)
@@ -366,6 +366,15 @@ Date Log:
 		}
 		else
 			return FALSE;
+	}
+	//returns de last room in the list
+	RoomPtr LastRoom(RoomPtr head)
+	{
+		RoomPtr aux = head;
+
+		while (aux->next != NULL)
+			aux = aux->next;
+		return aux;
 	}
 #pragma endregion
 
@@ -1063,6 +1072,22 @@ Date Log:
 				return TRUE;
 			}
 			return FALSE;
+		}
+		CharacterPtr InstanciateChar(CharacterPtr character, RoomPtr startingRoom, Vector2 position, int playerNumber)
+		{
+			CharacterPtr aux = (CharacterPtr)malloc(sizeof(Character));
+			aux->inteligence = character->inteligence;
+			aux->might = character->might;
+			aux->speed = character->speed;
+			aux->sanity = character->sanity;
+			aux->items = character->items;
+			aux->room = startingRoom;
+			aux->position = position;
+			aux->minions = NULL;
+			strcpy(aux->name, character->name);
+			aux->playerNumber = playerNumber;
+			aux->next = NULL;
+			return aux;
 		}
 		//Removes a Character from the CharacterArray.
 		BOOL RemoveCharFromArray(MasterPtr master, string node)

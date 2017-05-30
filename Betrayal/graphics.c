@@ -10,6 +10,7 @@ BOOL AssignPlayer(MasterPtr master, int playerNumber, CharacterPtr selectedChar)
 {
 	selectedChar->playerNumber = playerNumber + 1;
 	master->characterList = AddCharToList(master->characterList, selectedChar);
+
 	return TRUE;
 }
 
@@ -327,7 +328,7 @@ int DrawRoom(RoomPtr room, CameraPtr camera)
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "          ");
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y++, "#        #");
-		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y,   "#+#....#+#");
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y, "#+#....#+#");
 	}
 	else
 	{
@@ -402,130 +403,158 @@ BOOL DrawError(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	return TRUE;
 }
 
+BOOL PlayerMovement(MasterPtr master, CharacterPtr currentPlayer, CameraPtr cam, KEYBOARD input, FloorPtr currentFloor)
+{
+	RoomPtr auxRoom = currentFloor->roomList;
+	int auxMovement = currentPlayer->speed;
+	Vector2 auxVec = ChangeVector2(0, 0);
+	BOOL roomExists = FALSE;
+
+	if (input == LEFT_ARROW)
+	{
+		while (auxRoom != NULL) //percorre todos os rooms da lista
+		{
+			//se existe 1 room posicionado a esquerda
+			if (auxRoom->position.x == currentPlayer->room->position.x - ROOM_SIZE * 2)
+			{
+				roomExists = TRUE;
+				//se o player ainda se pode movimentar subtrai 1 movement
+				auxMovement--;
+				currentPlayer->room = auxRoom;
+				break;
+			}
+			auxRoom = auxRoom->next;
+		}
+		if (!roomExists)
+		{
+			//se nao existe nenhum room posicionado esse lugar, entao abre um.
+			OpenRoom(master, currentFloor, currentPlayer->room, LEFT);
+			currentPlayer->room = LastRoom(currentFloor->roomList);
+			UpdateMap(currentFloor, &cam, auxVec);
+			DrawMap(cam->viewPort);
+		}
+	}
+	if (input == RIGHT_ARROW)
+	{
+		while (auxRoom != NULL) //percorre todos os rooms da lista
+		{
+			//se existe 1 room posicionado a esquerda
+			if (auxRoom->position.x == currentPlayer->room->position.x + ROOM_SIZE * 2)
+			{
+				roomExists = TRUE;
+				//se o player ainda se pode movimentar subtrai 1 movement
+				auxMovement--;
+				currentPlayer->room = auxRoom;
+				break;
+			}
+			auxRoom = auxRoom->next;
+		}
+		if (!roomExists)
+		{
+			//se nao existe nenhum room posicionado esse lugar, entao abre um.
+			OpenRoom(master, currentFloor, currentPlayer->room, RIGHT);
+			currentPlayer->room = LastRoom(currentFloor->roomList);
+			UpdateMap(currentFloor, &cam, auxVec);
+			DrawMap(cam->viewPort);
+		}
+	}
+	if (input == UP_ARROW)
+	{
+		while (auxRoom != NULL) //percorre todos os rooms da lista
+		{
+			//se existe 1 room posicionado a esquerda
+			if (auxRoom->position.y == currentPlayer->room->position.y + ROOM_SIZE)
+			{
+				roomExists = TRUE;
+				//se o player ainda se pode movimentar subtrai 1 movement
+				auxMovement--;
+				currentPlayer->room = auxRoom;
+				break;
+			}
+			auxRoom = auxRoom->next;
+		}
+		if (!roomExists)
+		{
+			//se nao existe nenhum room posicionado esse lugar, entao abre um.
+			OpenRoom(master, currentFloor, currentPlayer->room, UP);
+			currentPlayer->room = LastRoom(currentFloor->roomList);
+			UpdateMap(currentFloor, &cam, auxVec);
+			DrawMap(cam->viewPort);
+		}
+	}
+	if (input == DOWN_ARROW)
+	{
+		while (auxRoom != NULL) //percorre todos os rooms da lista
+		{
+			//se existe 1 room posicionado a esquerda
+			if (auxRoom->position.y == currentPlayer->room->position.y - ROOM_SIZE)
+			{
+				roomExists = TRUE;
+				//se o player ainda se pode movimentar subtrai 1 movement
+				auxMovement--;
+				currentPlayer->room = auxRoom;
+				break;
+			}
+			auxRoom = auxRoom->next;
+		}
+		if (!roomExists)
+		{
+			//se nao existe nenhum room posicionado esse lugar, entao abre um.
+			OpenRoom(master, currentFloor, currentPlayer->room, DOWN);
+			currentPlayer->room = LastRoom(currentFloor->roomList);
+			UpdateMap(currentFloor, &cam, auxVec);
+			DrawMap(cam->viewPort);
+		}
+	}
+	return TRUE;
+}
+
 void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
 	int stopGame = 1;
 	KEYBOARD input = NONE;
-	Camera cam = InitCamera(-((MAX_WIDTH / 2) - (ROOM_SIZE)), -((MAX_HEIGHT / 2) - (ROOM_SIZE * 3/ 2)));
+	Camera cam = InitCamera(-((MAX_WIDTH / 2) - (ROOM_SIZE)), -((MAX_HEIGHT / 2) - (ROOM_SIZE * 3 / 2)));
 	CharacterPtr currentPlayer;
+	FloorPtr currentFloor = master->map.mapFloor->next;
 
 	Vector2 auxVec = ChangeVector2(0, 0);
 	RoomPtr roomAux = InstanciateRoom(&(master->cards.roomList[0]), auxVec);
-	master->map.mapFloor->next->roomList = AddRoomToList(master->map.mapFloor->next->roomList, roomAux);
-	
+	currentFloor->roomList = AddRoomToList(currentFloor->roomList, roomAux);
+
 	auxVec = ChangeVector2(0, 0 + ROOM_SIZE);
 	roomAux = InstanciateRoom(&(master->cards.roomList[1]), auxVec);
-	master->map.mapFloor->next->roomList = AddRoomToList(master->map.mapFloor->next->roomList, roomAux);
+	currentFloor->roomList = AddRoomToList(currentFloor->roomList, roomAux);
 
 	auxVec = ChangeVector2(0, 0 + ROOM_SIZE * 2);
 	roomAux = InstanciateRoom(&(master->cards.roomList[2]), auxVec);
-	master->map.mapFloor->next->roomList = AddRoomToList(master->map.mapFloor->next->roomList, roomAux);
+	currentFloor->roomList = AddRoomToList(currentFloor->roomList, roomAux);
 
 	auxVec = ChangeVector2(0, 0);
 	UpdateMap(master->map.mapFloor->next, &cam, auxVec);
+	DrawMap(&(cam.viewPort));
 
 	while (stopGame)
 	{
 		//UpdateMap(master->map.mapFloor->next, &cam, auxVec);
-		//DrawMap(&(cam.viewPort));
 		input = ReadInput();
-		RoomPtr auxRoom = master->map.mapFloor->roomList;
+		RoomPtr auxRoom;
 		CharacterPtr auxChar = master->characterList;
 		BOOL roomExists = FALSE;
 
 		while (auxChar != NULL)
 		{
 			int auxMovement = auxChar->speed;
-			if (input == LEFT_ARROW)
-			{
-				while (auxRoom != NULL) //percorre todos os rooms da lista
-				{
-					//se existe 1 room posicionado a esquerda
-					if (auxRoom->position.x == auxChar->room->position.x - ROOM_SIZE * 2)
-					{
-						roomExists = TRUE;
-						//se o player ainda se pode movimentar subtrai 1 movement
-						if (auxMovement != 0)
-							auxMovement--;
-						//caso contrario acaba a iteracao do player actual
-						else
-							break;
-					}
-					auxRoom = auxRoom->next;
-				}
-				if (!roomExists)
-				{
-					//se nao existe nenhum room posicionado esse lugar, entao abre um.
-					OpenRoom(master, master->map.mapFloor->next, roomAux, LEFT);
-					UpdateMap(master->map.mapFloor->next, &cam, auxVec);
-					DrawMap(&(cam.viewPort));
-				}
-			}
-			else if (input == RIGHT_ARROW)
-			{
-				while (auxRoom != NULL)
-				{
-					if (auxRoom->position.x == auxChar->room->position.x + ROOM_SIZE * 2)
-					{
-						roomExists = TRUE;
-						if (auxMovement != 0)
-							auxMovement--;
-						else
-							break;
-					}
-					auxRoom = auxRoom->next;
-				}
-				if (!roomExists)
-				{
-					OpenRoom(master, master->map.mapFloor->next, roomAux, RIGHT);
-					UpdateMap(master->map.mapFloor->next, &cam, auxVec);
-					DrawMap(&(cam.viewPort));
-				}
-			}
-			else if (input == UP_ARROW)
-			{
-				while (auxRoom != NULL)
-				{
-					if (auxRoom->position.y == auxChar->room->position.y - ROOM_SIZE)
-					{
-						roomExists = TRUE;
-						if (auxMovement != 0)
-							auxMovement--;
-						else
-							break;
-					}
-					auxRoom = auxRoom->next;
-				}
-				if (!roomExists)
-				{
-					OpenRoom(master, master->map.mapFloor->next, roomAux, UP);
-					UpdateMap(master->map.mapFloor->next, &cam, auxVec);
-					DrawMap(&(cam.viewPort));
-				}
-			}
-			else if (input == DOWN_ARROW)
-			{
-				while (auxRoom != NULL)
-				{
-					if (auxRoom->position.y == auxChar->room->position.y + ROOM_SIZE)
-					{
-						roomExists = TRUE;
-						if (auxMovement != 0)
-							auxMovement--;
-						else
-							break;
-					}
-					auxRoom = auxRoom->next;
-				}
-				if (!roomExists)
-				{
-					OpenRoom(master, master->map.mapFloor->next, roomAux, DOWN);
-					UpdateMap(master->map.mapFloor->next, &cam, auxVec);
-					DrawMap(&(cam.viewPort));
-				}
 
+			while (auxMovement > 0)
+			{
+				auxRoom = currentFloor->roomList;
+				roomExists = FALSE;
+
+				PlayerMovement(master, auxChar, &cam, input, currentFloor);
+				auxChar = auxChar->next;
+				input = NONE;
 			}
-			auxChar = auxChar->next;
+
 		}
 	}
 }
