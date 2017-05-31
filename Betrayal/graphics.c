@@ -386,25 +386,27 @@ Camera InitCamera(int x, int y)
 		}
 		return 1;
 	}
+	//Adds the player to the camera viewport.
+	int DrawPlayer(CharacterPtr currentPlayer, CameraPtr camera)
+	{
+		Vector2 screenPos;
+		screenPos.x = currentPlayer->position.x - camera->MinBound.x + 1 + rand() % (ROOM_SIZE * 2 - 2);
+		screenPos.y = currentPlayer->position.y - camera->MinBound.y + 1 + rand() % (ROOM_SIZE - 2);
+
+		string ASCIIconversion;
+		ASCIIconversion[0] = currentPlayer->playerNumber + 48;
+		ASCIIconversion[1] = 0;
+		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y, ASCIIconversion);
+	}
 	//Updates the viewport of a camera with a floor.
-	int UpdateMap(FloorPtr currentFloor, CameraPtr camera, Vector2 cameraMovement)
+	int UpdateMap(CharacterPtr currentPlayer, CameraPtr camera, Vector2 cameraMovement)
 	{
 		camera->MinBound.x += cameraMovement.x;
 		camera->MinBound.y += cameraMovement.y;
 		camera->minLenght = camera->MinBound.x + camera->MinBound.y;
-int DrawPlayer(CharacterPtr currentPlayer, CameraPtr camera)
-{
-	Vector2 screenPos;
-	screenPos.x = currentPlayer->position.x - camera->MinBound.x + rand() % ROOM_SIZE * 2 - 2;
-	screenPos.y = currentPlayer->position.y - camera->MinBound.y + rand() % ROOM_SIZE - 2;
 
-	string ASCIIconversion;
-	ASCIIconversion[0] = currentPlayer->playerNumber + 48;
-	ASCIIconversion[1] = 0;
-	InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y, ASCIIconversion);
-}
 
-		RoomPtr roomAux = currentFloor->roomList;
+		RoomPtr roomAux = currentPlayer->currentFloor->roomList;
 		while (roomAux)
 		{
 			if (roomAux->positionLenght < camera->minLenght)
@@ -417,7 +419,7 @@ int DrawPlayer(CharacterPtr currentPlayer, CameraPtr camera)
 			DrawRoom(roomAux, camera);
 			roomAux = roomAux->next;
 		}
-		//DRAW PLAYERS AND WATNOT
+		DrawPlayer(currentPlayer, camera);
 	}
 #pragma endregion
 

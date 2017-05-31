@@ -1074,7 +1074,7 @@ Date Log:
 			aux->items = character->items;
 			aux->room = startingRoom;
 			aux->currentFloor = currentFloor;
-			aux->position = position;
+			aux->position = startingRoom->position;
 			aux->minions = NULL;
 			strcpy(aux->name, character->name);
 			aux->playerNumber = playerNumber;
@@ -1192,8 +1192,7 @@ unsigned int DiceRoll(int stat)
 BOOL AssignPlayer(MasterPtr master, int playerNumber, CharacterPtr selectedChar)
 {
 	Vector2 auxVec = ChangeVector2(0, 0);
-	CharacterPtr charAux = InstanciateChar(selectedChar, master->map.mapFloor->next->roomList, master->map.mapFloor->next, auxVec, playerNumber + 1);
-	charAux->room = master->map.mapFloor->next->roomList->next->next;
+	CharacterPtr charAux = InstanciateChar(selectedChar, master->map.mapFloor->next->roomList->next->next, master->map.mapFloor->next, auxVec, playerNumber + 1);
 	master->characterList = AddCharToList(master->characterList, charAux);
 
 	return TRUE;
