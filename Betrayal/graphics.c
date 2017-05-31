@@ -8,7 +8,9 @@
 //Asigns a character to a player
 BOOL AssignPlayer(MasterPtr master, int playerNumber, CharacterPtr selectedChar)
 {
-	Vector2 auxVec = ChangeVector2(0, 0);
+	Vector2 auxVec = master->map.mapFloor->next->roomList->next->next->position;
+	auxVec.x++;
+	auxVec.y++;
 	CharacterPtr charAux = InstanciateChar(selectedChar, master->map.mapFloor->next->roomList, master->map.mapFloor->next, auxVec, playerNumber + 1);
 	charAux->room = master->map.mapFloor->next->roomList->next->next;
 	master->characterList = AddCharToList(master->characterList, charAux);
@@ -372,13 +374,24 @@ int DrawRoom(RoomPtr room, CameraPtr camera)
 	}
 	return 1;
 }
-int UpdateMap(FloorPtr currentFloor, CameraPtr camera, Vector2 cameraMovement)
+int DrawPlayer(CharacterPtr currentPlayer, CameraPtr camera)
+{
+	Vector2 screenPos;
+	screenPos.x = currentPlayer->position.x - camera->MinBound.x + rand() % ROOM_SIZE * 2 - 2;
+	screenPos.y = currentPlayer->position.y - camera->MinBound.y + rand() % ROOM_SIZE - 2;
+
+	string ASCIIconversion;
+	ASCIIconversion[0] = currentPlayer->playerNumber + 48;
+	ASCIIconversion[1] = 0;
+	InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y, ASCIIconversion);
+}
+int UpdateMap(CharacterPtr currentPlayer, CameraPtr camera, Vector2 cameraMovement)
 {
 	camera->MinBound.x += cameraMovement.x;
 	camera->MinBound.y += cameraMovement.y;
 	camera->minLenght = camera->MinBound.x + camera->MinBound.y;
 
-	RoomPtr roomAux = currentFloor->roomList;
+	RoomPtr roomAux = currentPlayer->currentFloor->roomList;
 	while (roomAux)
 	{
 		if (roomAux->positionLenght < camera->minLenght)
@@ -390,8 +403,9 @@ int UpdateMap(FloorPtr currentFloor, CameraPtr camera, Vector2 cameraMovement)
 			break;*/
 		DrawRoom(roomAux, camera);
 		roomAux = roomAux->next;
+		DrawPlayer(currentPlayer, camera);
 	}
-	//DRAW PLAYERS AND WATNOT
+
 }
 int DrawMap(char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 {
@@ -431,10 +445,9 @@ BOOL PlayerMovement(MasterPtr master, CharacterPtr currentPlayer, CameraPtr cam,
 		{
 			//se nao existe nenhum room posicionado esse lugar, entao abre um.
 			currentPlayer->room = OpenRoom(master, currentPlayer->currentFloor, currentPlayer->room, LEFT);	
-			UpdateMap(currentPlayer->currentFloor, cam, auxVec);
-			DrawMap(cam->viewPort);
 			*auxMovement = 0;
 		}
+		currentPlayer->position.x -= ROOM_SIZE * 2;
 	}
 	else if (input == RIGHT_ARROW)
 	{
@@ -456,10 +469,10 @@ BOOL PlayerMovement(MasterPtr master, CharacterPtr currentPlayer, CameraPtr cam,
 		{
 			//se nao existe nenhum room posicionado esse lugar, entao abre um.
 			currentPlayer->room = OpenRoom(master, currentPlayer->currentFloor, currentPlayer->room, RIGHT);			
-			UpdateMap(currentPlayer->currentFloor, cam, auxVec);
-			DrawMap(cam->viewPort);
+
 			*auxMovement = 0;
 		}
+		currentPlayer->position.x += ROOM_SIZE * 2;
 	}
 	else if (input == UP_ARROW)
 	{
@@ -481,10 +494,9 @@ BOOL PlayerMovement(MasterPtr master, CharacterPtr currentPlayer, CameraPtr cam,
 		{
 			//se nao existe nenhum room posicionado esse lugar, entao abre um.
 			currentPlayer->room = OpenRoom(master, currentPlayer->currentFloor, currentPlayer->room, UP);			
-			UpdateMap(currentPlayer->currentFloor, cam, auxVec);
-			DrawMap(cam->viewPort);
 			*auxMovement = 0;
 		}
+		currentPlayer->position.y -= ROOM_SIZE;
 	}
 	else if (input == DOWN_ARROW)
 	{
@@ -506,10 +518,9 @@ BOOL PlayerMovement(MasterPtr master, CharacterPtr currentPlayer, CameraPtr cam,
 		{
 			//se nao existe nenhum room posicionado esse lugar, entao abre um.
 			currentPlayer->room = OpenRoom(master, currentPlayer->currentFloor, currentPlayer->room, DOWN);			
-			UpdateMap(currentPlayer->currentFloor, cam, auxVec);
-			DrawMap(cam->viewPort);
 			*auxMovement = 0;
 		}
+		currentPlayer->position.y += ROOM_SIZE;
 	}
 	else
 	{
@@ -546,7 +557,8 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	while (stopGame)
 	{
 		CharacterPtr auxChar = master->characterList;
-		UpdateMap(auxChar->currentFloor, &cam, auxVec);
+		CleanDrawingTable(&(cam.viewPort));
+		UpdateMap(auxChar, &cam, auxVec);
 		DrawMap(&cam.viewPort);
 
 		while (auxChar != NULL)
@@ -559,6 +571,9 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 
 				PlayerMovement(master, auxChar, &cam, input, &auxMovement);
 				input = NONE;
+				CleanDrawingTable(&(cam.viewPort));
+				UpdateMap(auxChar, &cam, auxVec);
+				DrawMap(&(cam.viewPort));
 			}
 			auxChar = auxChar->next;
 		}

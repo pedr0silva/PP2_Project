@@ -1035,7 +1035,7 @@ Date Log:
 				head = node;
 			else
 			{
-				while (aux && aux->playerNumber > node->playerNumber)
+				while (aux && aux->playerNumber < node->playerNumber)
 				{
 					aux2 = aux;
 					aux = aux->next;
