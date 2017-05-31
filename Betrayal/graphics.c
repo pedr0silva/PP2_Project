@@ -399,7 +399,7 @@ Camera InitCamera(int x, int y)
 		InsertLineInDrawingTable(camera->viewPort, screenPos.x, screenPos.y, ASCIIconversion);
 	}
 	//Updates the viewport of a camera with a floor.
-	int UpdateMap(CharacterPtr currentPlayer, CameraPtr camera, Vector2 cameraMovement)
+	int UpdateMap(MasterPtr master, CharacterPtr currentPlayer, CameraPtr camera, Vector2 cameraMovement)
 	{
 		camera->MinBound.x += cameraMovement.x;
 		camera->MinBound.y += cameraMovement.y;
@@ -407,6 +407,7 @@ Camera InitCamera(int x, int y)
 
 
 		RoomPtr roomAux = currentPlayer->currentFloor->roomList;
+		CharacterPtr charAux = master->characterList;
 		while (roomAux)
 		{
 			if (roomAux->positionLenght < camera->minLenght)
@@ -419,7 +420,11 @@ Camera InitCamera(int x, int y)
 			DrawRoom(roomAux, camera);
 			roomAux = roomAux->next;
 		}
-		DrawPlayer(currentPlayer, camera);
+		while (charAux)
+		{
+			DrawPlayer(charAux, camera);
+			charAux = charAux->next;
+		}
 	}
 #pragma endregion
 
@@ -563,7 +568,7 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 	{
 		CharacterPtr auxChar = master->characterList;
 		CleanDrawingTable(&(cam.viewPort));
-		UpdateMap(auxChar, &cam, auxVec);
+		UpdateMap(master, auxChar, &cam, auxVec);
 		DrawMap(&cam.viewPort);
 
 		while (auxChar != NULL)
@@ -577,7 +582,7 @@ void GameLoop(MasterPtr master, char(*drawingTable)[MAX_HEIGHT][MAX_WIDTH])
 				PlayerMovement(master, auxChar, &cam, input, &auxMovement);
 				input = NONE;
 				CleanDrawingTable(&(cam.viewPort));
-				UpdateMap(auxChar, &cam, auxVec);
+				UpdateMap(master, auxChar, &cam, auxVec);
 				DrawMap(&(cam.viewPort));
 			}
 			auxChar = auxChar->next;
