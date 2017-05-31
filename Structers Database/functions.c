@@ -1188,6 +1188,16 @@ unsigned int DiceRoll(int stat)
 
 	return rv;
 }
+//Asigns a character to a player
+BOOL AssignPlayer(MasterPtr master, int playerNumber, CharacterPtr selectedChar)
+{
+	Vector2 auxVec = ChangeVector2(0, 0);
+	CharacterPtr charAux = InstanciateChar(selectedChar, master->map.mapFloor->next->roomList, master->map.mapFloor->next, auxVec, playerNumber + 1);
+	charAux->room = master->map.mapFloor->next->roomList->next->next;
+	master->characterList = AddCharToList(master->characterList, charAux);
+
+	return TRUE;
+}
 
 #pragma region DataManagement
 	//Resests all data of a Master.

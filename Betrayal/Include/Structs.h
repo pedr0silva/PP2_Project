@@ -280,6 +280,7 @@ Date Log:
 	#pragma endregion
 	#pragma region ROLLS / STATS
 		__declspec(dllexport) unsigned int DiceRoll(int stat);
+		__declspec(dllexport) BOOL AssignPlayer(MasterPtr master, int playerNumber, CharacterPtr selectedChar);
 	#pragma endregion
 	#pragma region DATABASE
 		__declspec(dllexport) BOOL Reset(MasterPtr master);
